@@ -1,0 +1,9 @@
+*.iml
+.DS_Store
+/build
+/.gradle
+/.kotlin
+/local.properties
+**/build/
+captures/
+*.log

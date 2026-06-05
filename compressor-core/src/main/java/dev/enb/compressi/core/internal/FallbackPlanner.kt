@@ -1,6 +1,7 @@
 package dev.enb.compressi.core.internal
 
 import dev.enb.compressi.core.CompressionRequest
+import dev.enb.compressi.core.ForceCodec
 import dev.enb.compressi.core.OutputCodec
 
 internal class FallbackPlanner(
@@ -13,8 +14,16 @@ internal class FallbackPlanner(
         capability: CapabilitySnapshot,
     ): List<CompressionPlan> {
         val firstPlan = policyEngine.plan(request, source, capability)
+        if (request.forceCodec != ForceCodec.AUTO) {
+            return listOf(firstPlan)
+        }
+
         val retryPlan = when (firstPlan.codec) {
-            OutputCodec.HEVC -> policyEngine.plan(request, source, capability, forcedCodec = OutputCodec.AVC)
+            OutputCodec.HEVC -> if (capability.avcEncoderAvailable) {
+                policyEngine.plan(request, source, capability, forcedCodec = OutputCodec.AVC)
+            } else {
+                null
+            }
             OutputCodec.AVC -> if (capability.apiLevel < 29) {
                 firstPlan.copy(
                     targetHeight = minOf(firstPlan.targetHeight ?: source.height, 720),
@@ -27,4 +36,3 @@ internal class FallbackPlanner(
         return listOfNotNull(firstPlan, retryPlan)
     }
 }
-

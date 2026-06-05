@@ -4,15 +4,23 @@ import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Bundle
 import android.widget.ArrayAdapter
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.graphics.Insets
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
+import dev.enb.compressi.core.CompressionPreset
 import dev.enb.compressi.core.CompressionFailure
 import dev.enb.compressi.core.CompressionHandle
 import dev.enb.compressi.core.CompressionListener
 import dev.enb.compressi.core.CompressionRequest
 import dev.enb.compressi.core.CompressionState
 import dev.enb.compressi.core.CompressionSuccess
+import dev.enb.compressi.core.ForceCodec
 import dev.enb.compressi.core.VideoCompressor
+import dev.enb.compressi.core.buildCompressionRequest
 import dev.enb.compressi.sample.databinding.ActivityMainBinding
 import java.io.File
 
@@ -29,6 +37,16 @@ class MainActivity : ComponentActivity(), CompressionListener {
         ResolutionOption("1080p", 1080),
         ResolutionOption("720p", 720),
         ResolutionOption("480p", 480),
+    )
+    private val presetOptions = listOf(
+        PresetOption("Quality", CompressionPreset.QUALITY),
+        PresetOption("Balanced", CompressionPreset.BALANCED),
+        PresetOption("Small Size", CompressionPreset.SMALL_SIZE),
+    )
+    private val codecOptions = listOf(
+        CodecOption("Auto", ForceCodec.AUTO),
+        CodecOption("AVC", ForceCodec.AVC),
+        CodecOption("HEVC", ForceCodec.HEVC),
     )
 
     private val picker = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
@@ -56,11 +74,13 @@ class MainActivity : ComponentActivity(), CompressionListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         compressor = VideoCompressor(applicationContext)
-        setupResolutionPicker()
+        setupPickers()
+        applyEdgeToEdgeInsets()
 
         binding.pickSourceButton.setOnClickListener {
             picker.launch(arrayOf("video/*"))
@@ -128,28 +148,80 @@ class MainActivity : ComponentActivity(), CompressionListener {
         }
         val outputDir = File(cacheDir, "compressed").apply { mkdirs() }
         val selectedResolution = resolutionOptions[binding.resolutionSpinner.selectedItemPosition]
+        val selectedPreset = presetOptions[binding.presetSpinner.selectedItemPosition]
+        val selectedCodec = codecOptions[binding.codecSpinner.selectedItemPosition]
+        val maxBitrate = binding.maxBitrateInput.text.toString().trim()
+            .takeIf { it.isNotEmpty() }
+            ?.toDoubleOrNull()
+            ?.times(1_000_000)
+            ?.toInt()
+        val progressIntervalMs = binding.progressIntervalInput.text.toString().trim()
+            .toLongOrNull()
+            ?.coerceAtLeast(1L)
+            ?: 250L
+
         activeHandle = compressor.start(
-            CompressionRequest(
+            buildCompressionRequest(
                 inputUri = source,
                 outputDirectory = outputDir,
-                maxResolutionCap = selectedResolution.maxHeight,
-            ),
+            ) {
+                preset = selectedPreset.preset
+                maxResolutionCap = selectedResolution.maxHeight
+                allowHevc = binding.allowHevcCheck.isChecked
+                keepAudio = binding.keepAudioCheck.isChecked
+                keepOriginalIfLarger = binding.keepOriginalIfLargerCheck.isChecked
+                forceCodec = selectedCodec.codec
+                this.maxBitrate = maxBitrate
+                this.progressIntervalMs = progressIntervalMs
+            },
             listener = this,
         )
         binding.progressIndicator.progress = 0
         binding.outputValue.text = ""
-        binding.statusValue.text = "Compression started (${selectedResolution.label})"
+        binding.statusValue.text = buildString {
+            append("Compression started")
+            append(" | ${selectedPreset.label}")
+            append(" | ${selectedResolution.label}")
+            append(" | ${selectedCodec.label}")
+        }
     }
 
-    private fun setupResolutionPicker() {
+    private fun setupPickers() {
+        setupSpinner(binding.resolutionSpinner, resolutionOptions.map { it.label }, 1)
+        setupSpinner(binding.presetSpinner, presetOptions.map { it.label }, 1)
+        setupSpinner(binding.codecSpinner, codecOptions.map { it.label }, 0)
+    }
+
+    private fun setupSpinner(
+        spinner: android.widget.Spinner,
+        labels: List<String>,
+        defaultIndex: Int,
+    ) {
         val adapter = ArrayAdapter(
             this,
             android.R.layout.simple_spinner_item,
-            resolutionOptions.map { it.label },
+            labels,
         )
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        binding.resolutionSpinner.adapter = adapter
-        binding.resolutionSpinner.setSelection(1)
+        spinner.adapter = adapter
+        spinner.setSelection(defaultIndex)
+    }
+
+    private fun applyEdgeToEdgeInsets() {
+        val horizontalPadding = resources.displayMetrics.density.times(24).toInt()
+        val verticalPadding = resources.displayMetrics.density.times(24).toInt()
+        ViewCompat.setOnApplyWindowInsetsListener(binding.rootScrollView) { view, windowInsets ->
+            val systemBars = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            view.updatePadding(
+                left = horizontalPadding + systemBars.left,
+                top = verticalPadding + systemBars.top,
+                right = horizontalPadding + systemBars.right,
+                bottom = verticalPadding + systemBars.bottom,
+            )
+            windowInsets
+        }
     }
 
     private fun inspectVideo(uri: Uri): VideoSummary? {
@@ -195,6 +267,16 @@ private data class VideoSummary(
 private data class ResolutionOption(
     val label: String,
     val maxHeight: Int?,
+)
+
+private data class PresetOption(
+    val label: String,
+    val preset: CompressionPreset,
+)
+
+private data class CodecOption(
+    val label: String,
+    val codec: ForceCodec,
 )
 
 private fun Long.toMb(): Double = this.toDouble() / (1024.0 * 1024.0)

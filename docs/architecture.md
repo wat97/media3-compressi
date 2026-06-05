@@ -1,18 +1,28 @@
-# Android Video Compression Architecture
+# Vidsqueeze Architecture
 
 ## Goals
 
-- Replace third-party compression stack with Kotlin-native Media3 Transformer flow.
-- Keep v1 focused on local video sources, foreground execution, and predictable hardware paths.
+- Prepare repo for Flutter plugin release shape.
+- Keep Android native core as current stable implementation detail.
+- Prepare iOS-native parity scaffolding for future core implementation.
 - Bias toward zero-corruption output and stable fallback before aggressive size reduction.
 
 ## Modules
 
+- `lib`
+  - Public Dart compression-only API surface
+- `android`
+  - Flutter plugin Android bridge
 - `compressor-core`
-  - Public compression facade
+  - Native Android compression engine
   - Policy engine, capability probing, Media3 orchestration, validation, and error mapping
+- `ios`
+  - Native iOS parity scaffolding
+  - Request, preset, policy, and fallback model preparation for `iOS 14+`
 - `sample-app`
-  - Manual verification app for picking a source, choosing target resolution, running compression, and viewing source-vs-output comparison
+  - Internal Android verification harness
+- `example`
+  - Flutter example scaffold
 
 ## V1 Defaults
 
@@ -33,4 +43,4 @@
 - Let Media3 encoder fallback stay enabled for safe device-driven fallback.
 - Retry once in app policy when preferred codec path fails.
 - Validate output before promoting temp file to final destination.
-- Return domain-level error codes to keep Flutter bridge thin later.
+- Return domain-level error codes to keep Flutter bridge thin.

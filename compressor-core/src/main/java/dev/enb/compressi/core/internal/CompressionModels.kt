@@ -33,9 +33,11 @@ internal data class CompressionPlan(
     val codec: OutputCodec,
     val targetHeight: Int?,
     val targetBitrate: Int,
+    val removeAudio: Boolean,
     val transcodeAudio: Boolean,
     val audioBitrate: Int?,
     val outputDirectory: File,
     val outputFileName: String,
     val preset: CompressionPreset,
+    val progressIntervalMs: Long,
 )

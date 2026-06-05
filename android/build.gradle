@@ -1,0 +1,67 @@
+group 'dev.enb.vidsqueeze'
+version '0.1.0-dev.1'
+
+buildscript {
+    ext.kotlin_version = '2.0.21'
+    repositories {
+        google()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.5.2'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+
+def flutterSdkPath = {
+    def localProperties = new Properties()
+    def localPropertiesFile = rootProject.file('../local.properties')
+    if (localPropertiesFile.exists()) {
+        localPropertiesFile.withReader('UTF-8') { reader ->
+            localProperties.load(reader)
+        }
+    }
+    return localProperties.getProperty('flutter.sdk') ?: System.getenv('FLUTTER_HOME') ?: System.getenv('FLUTTER_ROOT')
+}()
+
+android {
+    namespace 'dev.enb.vidsqueeze'
+    compileSdk 36
+
+    defaultConfig {
+        minSdk 23
+        consumerProguardFiles 'consumer-rules.pro'
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+}
+
+dependencies {
+    implementation project(':compressor-core')
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1"
+    if (flutterSdkPath != null) {
+        compileOnly files("${flutterSdkPath}/bin/cache/artifacts/engine/android-arm64/flutter.jar")
+    }
+}

@@ -2,6 +2,7 @@ package dev.enb.compressi.core.internal
 
 import dev.enb.compressi.core.CompressionPreset
 import dev.enb.compressi.core.CompressionRequest
+import dev.enb.compressi.core.ForceCodec
 import dev.enb.compressi.core.OutputCodec
 import kotlin.math.roundToInt
 
@@ -13,36 +14,55 @@ internal class CompressionPolicyEngine {
         capability: CapabilitySnapshot,
         forcedCodec: OutputCodec? = null,
     ): CompressionPlan {
-        val codec = forcedCodec ?: chooseCodec(source, capability)
+        val codec = forcedCodec ?: chooseCodec(source, capability, request)
         val targetHeight = chooseTargetHeight(source, request.maxResolutionCap)
         val targetBitrate = chooseTargetBitrate(
             source = source,
             codec = codec,
             preset = request.preset,
             targetHeight = targetHeight,
+            maxBitrate = request.maxBitrate,
         )
+        val shouldKeepAudio = request.keepAudio && source.hasAudio
 
         return CompressionPlan(
             codec = codec,
             targetHeight = targetHeight,
             targetBitrate = targetBitrate,
-            transcodeAudio = shouldTranscodeAudio(source),
-            audioBitrate = if (shouldTranscodeAudio(source)) 128_000 else null,
+            removeAudio = !shouldKeepAudio,
+            transcodeAudio = shouldKeepAudio && shouldTranscodeAudio(source),
+            audioBitrate = if (shouldKeepAudio && shouldTranscodeAudio(source)) 128_000 else null,
             outputDirectory = request.outputDirectory,
             outputFileName = request.outputFileName,
             preset = request.preset,
+            progressIntervalMs = request.progressIntervalMs,
         )
     }
 
     internal fun chooseCodec(
         source: SourceVideoInfo,
         capability: CapabilitySnapshot,
+        request: CompressionRequest,
     ): OutputCodec {
+        when (request.forceCodec) {
+            ForceCodec.AVC -> {
+                check(capability.avcEncoderAvailable) { "Requested AVC encoder is unavailable" }
+                return OutputCodec.AVC
+            }
+            ForceCodec.HEVC -> {
+                check(capability.hevcEncoderAvailable) { "Requested HEVC encoder is unavailable" }
+                check(request.allowHevc) { "HEVC requested while allowHevc is false" }
+                return OutputCodec.HEVC
+            }
+            ForceCodec.AUTO -> Unit
+        }
+
         if (!capability.avcEncoderAvailable && !capability.hevcEncoderAvailable) {
             throw IllegalStateException("No supported hardware video encoder found")
         }
 
         if (
+            request.allowHevc &&
             capability.apiLevel >= 34 &&
             capability.hevcEncoderAvailable &&
             !source.isHdr &&
@@ -71,6 +91,7 @@ internal class CompressionPolicyEngine {
         codec: OutputCodec,
         preset: CompressionPreset,
         targetHeight: Int?,
+        maxBitrate: Int?,
     ): Int {
         val inputBitrate = source.bitrate ?: fallbackInputBitrate(source)
         val scaleFactor = if (targetHeight == null || source.height == 0) {
@@ -84,7 +105,8 @@ internal class CompressionPolicyEngine {
         }
         val fpsFactor = if ((source.frameRate ?: 30) > 30) 1.12 else 1.0
         val scaled = inputBitrate * scaleFactor * codecFactor * fpsFactor
-        return scaled.roundToInt().coerceAtLeast(1_200_000)
+        val computed = scaled.roundToInt().coerceAtLeast(1_200_000)
+        return maxBitrate?.let { minOf(computed, it) } ?: computed
     }
 
     private fun shouldTranscodeAudio(source: SourceVideoInfo): Boolean {

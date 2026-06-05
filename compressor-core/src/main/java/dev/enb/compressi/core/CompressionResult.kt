@@ -11,6 +11,7 @@ data class CompressionSuccess(
     val targetHeight: Int?,
     val targetBitrate: Int,
     val attempts: Int,
+    val usedOriginalSource: Boolean = false,
 )
 
 data class CompressionFailure(

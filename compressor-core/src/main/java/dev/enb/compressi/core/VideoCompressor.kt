@@ -83,15 +83,24 @@ class VideoCompressor private constructor(
                         dispatch(listener) { onStateChanged(CompressionState.Finalizing) }
                         outputValidator.validate(tempFile, source)
 
+                        val useOriginalSource = shouldKeepOriginalSource(request, source, tempFile)
                         val outputFile = File(plan.outputDirectory, plan.outputFileName)
                         if (outputFile.exists()) {
                             outputFile.delete()
                         }
-                        check(tempFile.renameTo(outputFile)) { "Failed to move temp output into final location" }
+
+                        val deliveredFile = if (useOriginalSource) {
+                            tempFile.delete()
+                            source.uri.takeIf { it.scheme == "file" }?.path?.let(::File)
+                                ?: throw IllegalStateException("Original source file is not accessible as a file")
+                        } else {
+                            check(tempFile.renameTo(outputFile)) { "Failed to move temp output into final location" }
+                            outputFile
+                        }
 
                         val success = CompressionSuccess(
-                            outputFile = outputFile,
-                            outputSizeBytes = outputFile.length(),
+                            outputFile = deliveredFile,
+                            outputSizeBytes = deliveredFile.length(),
                             sourceSizeBytes = source.fileSizeBytes,
                             durationMs = source.durationMs,
                             codec = when (plan.codec) {
@@ -101,6 +110,7 @@ class VideoCompressor private constructor(
                             targetHeight = plan.targetHeight,
                             targetBitrate = plan.targetBitrate,
                             attempts = index + 1,
+                            usedOriginalSource = useOriginalSource,
                         )
                         dispatch(listener) { onStateChanged(CompressionState.Completed) }
                         dispatch(listener) { onSuccess(success) }
@@ -151,6 +161,20 @@ class VideoCompressor private constructor(
         if (cancelled.get()) {
             throw CancellationException("Compression cancelled")
         }
+    }
+
+    private fun shouldKeepOriginalSource(
+        request: CompressionRequest,
+        source: dev.enb.compressi.core.internal.SourceVideoInfo,
+        compressedFile: File,
+    ): Boolean {
+        if (!request.keepOriginalIfLarger) {
+            return false
+        }
+        if (source.fileSizeBytes <= 0L || compressedFile.length() <= 0L) {
+            return false
+        }
+        return compressedFile.length() >= source.fileSizeBytes && request.inputUri.scheme == "file"
     }
 
     private fun dispatch(listener: CompressionListener, block: CompressionListener.() -> Unit) {

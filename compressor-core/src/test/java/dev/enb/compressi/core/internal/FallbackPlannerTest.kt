@@ -3,6 +3,7 @@ package dev.enb.compressi.core.internal
 import android.net.Uri
 import com.google.common.truth.Truth.assertThat
 import dev.enb.compressi.core.CompressionRequest
+import dev.enb.compressi.core.ForceCodec
 import dev.enb.compressi.core.OutputCodec
 import org.junit.Test
 import org.mockito.Mockito.mock
@@ -60,6 +61,22 @@ class FallbackPlannerTest {
 
         assertThat(attempts).hasSize(1)
         assertThat(attempts[0].codec).isEqualTo(OutputCodec.AVC)
+    }
+
+    @Test
+    fun `does not add retry when codec is forced`() {
+        val request = CompressionRequest(
+            inputUri = mock(Uri::class.java),
+            outputDirectory = File("build/tmp"),
+            forceCodec = ForceCodec.HEVC,
+        )
+        val source = fakeSource(width = 1920, height = 1080)
+        val capability = CapabilitySnapshot(apiLevel = 34, hevcEncoderAvailable = true, avcEncoderAvailable = true)
+
+        val attempts = planner.buildAttemptPlans(request, source, capability)
+
+        assertThat(attempts).hasSize(1)
+        assertThat(attempts[0].codec).isEqualTo(OutputCodec.HEVC)
     }
 
     private fun fakeSource(

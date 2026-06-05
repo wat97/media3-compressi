@@ -67,7 +67,7 @@ internal class TransformerRunner(
                     onProgress(progressHolder.progress)
                 }
                 if (!continuation.isCompleted) {
-                    mainHandler.postDelayed(this, 250L)
+                    mainHandler.postDelayed(this, plan.progressIntervalMs)
                 }
             }
         }
@@ -78,6 +78,7 @@ internal class TransformerRunner(
         }
 
         val editedMediaItem = EditedMediaItem.Builder(MediaItem.fromUri(source.uri))
+            .setRemoveAudio(plan.removeAudio)
             .setEffects(
                 Effects(
                     emptyList<AudioProcessor>(),

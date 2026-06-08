@@ -5,14 +5,15 @@ import 'package:flutter/services.dart';
 import 'models/compression_request.dart';
 import 'models/compression_result.dart';
 import 'models/compression_state.dart';
+import 'platform/channel_contract.dart';
 
 class Vidsqueeze {
   Vidsqueeze._();
 
   static final Vidsqueeze instance = Vidsqueeze._();
 
-  static const MethodChannel _methodChannel = MethodChannel('vidsqueeze/methods');
-  static const EventChannel _eventChannel = EventChannel('vidsqueeze/events');
+  static const MethodChannel _methodChannel = MethodChannel(VidsqueezeChannelContract.methodsChannel);
+  static const EventChannel _eventChannel = EventChannel(VidsqueezeChannelContract.eventsChannel);
 
   Stream<CompressionState>? _stateStream;
 
@@ -24,12 +25,12 @@ class Vidsqueeze {
 
   Future<CompressionResult> compress(CompressionRequest request) async {
     final result = await _methodChannel.invokeMapMethod<Object?, Object?>(
-      'compress',
+      VidsqueezeChannelContract.methodCompress,
       request.toMap(),
     );
     if (result == null) {
       throw PlatformException(
-        code: 'null_result',
+        code: VidsqueezeChannelContract.errorNullResult,
         message: 'Compression finished without a result payload',
       );
     }
@@ -37,7 +38,9 @@ class Vidsqueeze {
   }
 
   Future<void> cancel(String taskId) {
-    return _methodChannel.invokeMethod<void>('cancel', <String, Object?>{'taskId': taskId});
+    return _methodChannel.invokeMethod<void>(
+      VidsqueezeChannelContract.methodCancel,
+      <String, Object?>{VidsqueezeChannelContract.taskId: taskId},
+    );
   }
 }
-

@@ -14,6 +14,9 @@ void main() {
 
     final map = request.toMap();
 
+    expect(map['taskId'], isNull);
+    expect(map['inputPath'], 'content://video/test');
+    expect(map['outputDirectoryPath'], '/tmp/output');
     expect(map['preset'], 'quality');
     expect(map['forceCodec'], 'hevc');
     expect(map['maxBitrate'], 3000000);
@@ -30,5 +33,43 @@ void main() {
     expect(state.taskId, 'task-1');
     expect(state.phase, CompressionPhase.transcoding);
     expect(state.progressPercent, 45);
+    expect(state.toMap(), <String, Object?>{
+      'taskId': 'task-1',
+      'phase': 'transcoding',
+      'progressPercent': 45,
+      'code': null,
+      'message': null,
+    });
+  });
+
+  test('compression result roundtrips expected values', () {
+    final result = CompressionResult.fromMap(<Object?, Object?>{
+      'taskId': 'task-9',
+      'outputPath': '/tmp/output/compressed.mp4',
+      'outputSizeBytes': 1200,
+      'sourceSizeBytes': 4200,
+      'durationMs': 32000,
+      'codec': 'hevc',
+      'targetHeight': 720,
+      'targetBitrate': 1400000,
+      'attempts': 1,
+      'usedOriginalSource': false,
+    });
+
+    expect(result.taskId, 'task-9');
+    expect(result.codec, ForceCodec.hevc);
+    expect(result.targetHeight, 720);
+    expect(result.toMap(), <String, Object?>{
+      'taskId': 'task-9',
+      'outputPath': '/tmp/output/compressed.mp4',
+      'outputSizeBytes': 1200,
+      'sourceSizeBytes': 4200,
+      'durationMs': 32000,
+      'codec': 'hevc',
+      'targetHeight': 720,
+      'targetBitrate': 1400000,
+      'attempts': 1,
+      'usedOriginalSource': false,
+    });
   });
 }

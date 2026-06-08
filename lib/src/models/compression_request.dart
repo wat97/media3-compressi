@@ -1,5 +1,6 @@
 import 'compression_preset.dart';
 import 'force_codec.dart';
+import '../platform/channel_contract.dart';
 
 class CompressionRequest {
   const CompressionRequest({
@@ -32,19 +33,18 @@ class CompressionRequest {
 
   Map<String, Object?> toMap() {
     return <String, Object?>{
-      'taskId': taskId,
-      'inputPath': inputPath,
-      'outputDirectoryPath': outputDirectoryPath,
-      'outputFileName': outputFileName,
-      'preset': preset.value,
-      'maxResolutionCap': maxResolutionCap,
-      'allowHevc': allowHevc,
-      'keepAudio': keepAudio,
-      'keepOriginalIfLarger': keepOriginalIfLarger,
-      'forceCodec': forceCodec.value,
-      'maxBitrate': maxBitrate,
-      'progressIntervalMs': progressIntervalMs,
+      VidsqueezeChannelContract.taskId: taskId,
+      VidsqueezeChannelContract.inputPath: inputPath,
+      VidsqueezeChannelContract.outputDirectoryPath: outputDirectoryPath,
+      VidsqueezeChannelContract.outputFileName: outputFileName,
+      VidsqueezeChannelContract.preset: preset.value,
+      VidsqueezeChannelContract.maxResolutionCap: maxResolutionCap,
+      VidsqueezeChannelContract.allowHevc: allowHevc,
+      VidsqueezeChannelContract.keepAudio: keepAudio,
+      VidsqueezeChannelContract.keepOriginalIfLarger: keepOriginalIfLarger,
+      VidsqueezeChannelContract.forceCodec: forceCodec.value,
+      VidsqueezeChannelContract.maxBitrate: maxBitrate,
+      VidsqueezeChannelContract.progressIntervalMs: progressIntervalMs,
     };
   }
 }
-

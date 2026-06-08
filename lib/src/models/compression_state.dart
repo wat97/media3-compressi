@@ -1,10 +1,12 @@
+import '../platform/channel_contract.dart';
+
 enum CompressionPhase {
-  preparing('preparing'),
-  transcoding('transcoding'),
-  finalizing('finalizing'),
-  completed('completed'),
-  failed('failed'),
-  cancelled('cancelled');
+  preparing(VidsqueezeChannelContract.phasePreparing),
+  transcoding(VidsqueezeChannelContract.phaseTranscoding),
+  finalizing(VidsqueezeChannelContract.phaseFinalizing),
+  completed(VidsqueezeChannelContract.phaseCompleted),
+  failed(VidsqueezeChannelContract.phaseFailed),
+  cancelled(VidsqueezeChannelContract.phaseCancelled);
 
   const CompressionPhase(this.value);
 
@@ -35,12 +37,23 @@ class CompressionState {
 
   factory CompressionState.fromMap(Map<Object?, Object?> map) {
     return CompressionState(
-      taskId: map['taskId'] as String? ?? '',
-      phase: CompressionPhase.fromValue(map['phase'] as String? ?? 'failed'),
-      progressPercent: (map['progressPercent'] as num?)?.toInt(),
-      code: map['code'] as String?,
-      message: map['message'] as String?,
+      taskId: map[VidsqueezeChannelContract.taskId] as String? ?? '',
+      phase: CompressionPhase.fromValue(
+        map[VidsqueezeChannelContract.phase] as String? ?? VidsqueezeChannelContract.phaseFailed,
+      ),
+      progressPercent: (map[VidsqueezeChannelContract.progressPercent] as num?)?.toInt(),
+      code: map[VidsqueezeChannelContract.code] as String?,
+      message: map[VidsqueezeChannelContract.message] as String?,
     );
   }
-}
 
+  Map<String, Object?> toMap() {
+    return <String, Object?>{
+      VidsqueezeChannelContract.taskId: taskId,
+      VidsqueezeChannelContract.phase: phase.value,
+      VidsqueezeChannelContract.progressPercent: progressPercent,
+      VidsqueezeChannelContract.code: code,
+      VidsqueezeChannelContract.message: message,
+    };
+  }
+}

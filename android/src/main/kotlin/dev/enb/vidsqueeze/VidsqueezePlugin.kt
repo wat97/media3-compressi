@@ -3,6 +3,7 @@ package dev.enb.vidsqueeze
 import android.content.Context
 import android.net.Uri
 import dev.enb.compressi.core.CompressionFailure
+import dev.enb.compressi.core.CompressionHandle
 import dev.enb.compressi.core.CompressionListener
 import dev.enb.compressi.core.CompressionPreset
 import dev.enb.compressi.core.CompressionRequest
@@ -26,15 +27,15 @@ class VidsqueezePlugin : FlutterPlugin, MethodChannel.MethodCallHandler, EventCh
     private var eventSink: EventChannel.EventSink? = null
     private val activeTaskId = AtomicReference<String?>(null)
     private var compressor: VideoCompressor? = null
-    private var activeHandle: dev.enb.compressi.core.CompressionHandle? = null
+    private var activeHandle: CompressionHandle? = null
 
     override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         applicationContext = binding.applicationContext
         compressor = VideoCompressor(binding.applicationContext)
-        methodChannel = MethodChannel(binding.binaryMessenger, "vidsqueeze/methods").also {
+        methodChannel = MethodChannel(binding.binaryMessenger, FlutterContract.METHODS_CHANNEL).also {
             it.setMethodCallHandler(this)
         }
-        eventChannel = EventChannel(binding.binaryMessenger, "vidsqueeze/events").also {
+        eventChannel = EventChannel(binding.binaryMessenger, FlutterContract.EVENTS_CHANNEL).also {
             it.setStreamHandler(this)
         }
     }
@@ -61,35 +62,58 @@ class VidsqueezePlugin : FlutterPlugin, MethodChannel.MethodCallHandler, EventCh
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
-            "compress" -> compress(call, result)
-            "cancel" -> cancel(call, result)
+            FlutterContract.METHOD_COMPRESS -> compress(call, result)
+            FlutterContract.METHOD_CANCEL -> cancel(call, result)
             else -> result.notImplemented()
         }
     }
 
     private fun compress(call: MethodCall, result: MethodChannel.Result) {
         if (activeHandle != null) {
-            result.error("busy", "Another compression task is already running", null)
+            result.error(
+                FlutterContract.ERROR_BUSY,
+                "Another compression task is already running",
+                null,
+            )
             return
         }
 
-        val context = applicationContext ?: run {
-            result.error("no_context", "Plugin is not attached to an Android context", null)
+        applicationContext ?: run {
+            result.error(
+                FlutterContract.ERROR_NO_CONTEXT,
+                "Plugin is not attached to an Android context",
+                null,
+            )
             return
         }
         val compressor = compressor ?: run {
-            result.error("no_compressor", "Video compressor is unavailable", null)
+            result.error(
+                FlutterContract.ERROR_NO_COMPRESSOR,
+                "Video compressor is unavailable",
+                null,
+            )
             return
         }
 
         val args = call.arguments as? Map<*, *> ?: run {
-            result.error("bad_args", "compress expects a map payload", null)
+            result.error(
+                FlutterContract.ERROR_BAD_ARGS,
+                "compress expects a map payload",
+                null,
+            )
             return
         }
 
-        val taskId = args["taskId"] as? String ?: UUID.randomUUID().toString()
+        val taskId = args.stringOrNull(FlutterContract.KEY_TASK_ID)
+            ?.takeIf { it.isNotBlank() }
+            ?: UUID.randomUUID().toString()
         val request = runCatching { args.toCompressionRequest(taskId) }.getOrElse { throwable ->
-            result.error("bad_request", throwable.message, null)
+            val failure = throwable as? CompressionFailure
+            result.error(
+                failure?.code?.name?.lowercase() ?: FlutterContract.ERROR_BAD_REQUEST,
+                throwable.message,
+                mapOf(FlutterContract.KEY_TASK_ID to taskId),
+            )
             return
         }
 
@@ -110,15 +134,19 @@ class VidsqueezePlugin : FlutterPlugin, MethodChannel.MethodCallHandler, EventCh
                 override fun onFailure(failure: CompressionFailure) {
                     activeHandle = null
                     activeTaskId.set(null)
-                    result.error(failure.code.name.lowercase(), failure.message, mapOf("taskId" to taskId))
+                    result.error(
+                        failure.code.name.lowercase(),
+                        failure.message,
+                        mapOf(FlutterContract.KEY_TASK_ID to taskId),
+                    )
                 }
             },
         )
     }
 
     private fun cancel(call: MethodCall, result: MethodChannel.Result) {
-        val taskId = (call.arguments as? Map<*, *>)?.get("taskId") as? String
-        if (taskId != null && taskId == activeTaskId.get()) {
+        val taskId = (call.arguments as? Map<*, *>)?.stringOrNull(FlutterContract.KEY_TASK_ID)
+        if (taskId == null || taskId == activeTaskId.get()) {
             activeHandle?.cancel()
             activeHandle = null
             activeTaskId.set(null)
@@ -128,33 +156,37 @@ class VidsqueezePlugin : FlutterPlugin, MethodChannel.MethodCallHandler, EventCh
 }
 
 private fun Map<*, *>.toCompressionRequest(taskId: String): CompressionRequest {
-    val inputPath = get("inputPath") as? String ?: error("inputPath is required")
-    val outputDirectoryPath = get("outputDirectoryPath") as? String ?: error("outputDirectoryPath is required")
-    val outputFileName = get("outputFileName") as? String ?: "compressed_${taskId}.mp4"
+    val inputPath = stringOrNull(FlutterContract.KEY_INPUT_PATH)
+        ?: error("${FlutterContract.KEY_INPUT_PATH} is required")
+    val outputDirectoryPath = stringOrNull(FlutterContract.KEY_OUTPUT_DIRECTORY_PATH)
+        ?: error("${FlutterContract.KEY_OUTPUT_DIRECTORY_PATH} is required")
+    val outputFileName = stringOrNull(FlutterContract.KEY_OUTPUT_FILE_NAME)
+        ?.takeIf { it.isNotBlank() }
+        ?: "compressed_${taskId}.mp4"
     val preset = CompressionPreset.valueOf(
-        ((get("preset") as? String) ?: "balanced").toCompressionPresetName(),
+        (stringOrNull(FlutterContract.KEY_PRESET) ?: "balanced").toCompressionPresetName(),
     )
     val forceCodec = ForceCodec.valueOf(
-        ((get("forceCodec") as? String) ?: "auto").uppercase(),
+        (stringOrNull(FlutterContract.KEY_FORCE_CODEC) ?: "auto").uppercase(),
     )
 
     return CompressionRequest(
         inputUri = Uri.parse(inputPath),
-        outputDirectory = File(outputDirectoryPath),
+        outputDirectory = outputDirectoryPath.toPlatformFile(),
         outputFileName = outputFileName,
         preset = preset,
-        maxResolutionCap = (get("maxResolutionCap") as? Number)?.toInt(),
-        allowHevc = get("allowHevc") as? Boolean ?: true,
-        keepAudio = get("keepAudio") as? Boolean ?: true,
-        keepOriginalIfLarger = get("keepOriginalIfLarger") as? Boolean ?: true,
+        maxResolutionCap = (get(FlutterContract.KEY_MAX_RESOLUTION_CAP) as? Number)?.toInt(),
+        allowHevc = get(FlutterContract.KEY_ALLOW_HEVC) as? Boolean ?: true,
+        keepAudio = get(FlutterContract.KEY_KEEP_AUDIO) as? Boolean ?: true,
+        keepOriginalIfLarger = get(FlutterContract.KEY_KEEP_ORIGINAL_IF_LARGER) as? Boolean ?: true,
         forceCodec = forceCodec,
-        maxBitrate = (get("maxBitrate") as? Number)?.toInt(),
-        progressIntervalMs = (get("progressIntervalMs") as? Number)?.toLong() ?: 250L,
+        maxBitrate = (get(FlutterContract.KEY_MAX_BITRATE) as? Number)?.toInt(),
+        progressIntervalMs = (get(FlutterContract.KEY_PROGRESS_INTERVAL_MS) as? Number)?.toLong() ?: 250L,
     )
 }
 
 private fun String.toCompressionPresetName(): String {
-    return when (this.lowercase()) {
+    return when (lowercase()) {
         "quality" -> "QUALITY"
         "small_size" -> "SMALL_SIZE"
         else -> "BALANCED"
@@ -163,36 +195,104 @@ private fun String.toCompressionPresetName(): String {
 
 private fun CompressionState.toMap(taskId: String): Map<String, Any?> {
     return when (this) {
-        CompressionState.Preparing -> mapOf("taskId" to taskId, "phase" to "preparing")
-        CompressionState.Finalizing -> mapOf("taskId" to taskId, "phase" to "finalizing")
-        CompressionState.Completed -> mapOf("taskId" to taskId, "phase" to "completed")
-        CompressionState.Cancelled -> mapOf("taskId" to taskId, "phase" to "cancelled")
+        CompressionState.Preparing -> mapOf(
+            FlutterContract.KEY_TASK_ID to taskId,
+            FlutterContract.KEY_PHASE to FlutterContract.PHASE_PREPARING,
+        )
+        CompressionState.Finalizing -> mapOf(
+            FlutterContract.KEY_TASK_ID to taskId,
+            FlutterContract.KEY_PHASE to FlutterContract.PHASE_FINALIZING,
+        )
+        CompressionState.Completed -> mapOf(
+            FlutterContract.KEY_TASK_ID to taskId,
+            FlutterContract.KEY_PHASE to FlutterContract.PHASE_COMPLETED,
+        )
+        CompressionState.Cancelled -> mapOf(
+            FlutterContract.KEY_TASK_ID to taskId,
+            FlutterContract.KEY_PHASE to FlutterContract.PHASE_CANCELLED,
+        )
         is CompressionState.Transcoding -> mapOf(
-            "taskId" to taskId,
-            "phase" to "transcoding",
-            "progressPercent" to progressPercent,
+            FlutterContract.KEY_TASK_ID to taskId,
+            FlutterContract.KEY_PHASE to FlutterContract.PHASE_TRANSCODING,
+            FlutterContract.KEY_PROGRESS_PERCENT to progressPercent,
         )
         is CompressionState.Failed -> mapOf(
-            "taskId" to taskId,
-            "phase" to "failed",
-            "code" to failure.code.name.lowercase(),
-            "message" to failure.message,
+            FlutterContract.KEY_TASK_ID to taskId,
+            FlutterContract.KEY_PHASE to FlutterContract.PHASE_FAILED,
+            FlutterContract.KEY_CODE to failure.code.name.lowercase(),
+            FlutterContract.KEY_MESSAGE to failure.message,
         )
     }
 }
 
 private fun CompressionSuccess.toMap(taskId: String): Map<String, Any?> {
     return mapOf(
-        "taskId" to taskId,
-        "outputPath" to outputFile.absolutePath,
-        "outputSizeBytes" to outputSizeBytes,
-        "sourceSizeBytes" to sourceSizeBytes,
-        "durationMs" to durationMs,
-        "codec" to codec.name.lowercase(),
-        "targetHeight" to targetHeight,
-        "targetBitrate" to targetBitrate,
-        "attempts" to attempts,
-        "usedOriginalSource" to usedOriginalSource,
+        FlutterContract.KEY_TASK_ID to taskId,
+        FlutterContract.KEY_OUTPUT_PATH to outputFile.absolutePath,
+        FlutterContract.KEY_OUTPUT_SIZE_BYTES to outputSizeBytes,
+        FlutterContract.KEY_SOURCE_SIZE_BYTES to sourceSizeBytes,
+        FlutterContract.KEY_DURATION_MS to durationMs,
+        FlutterContract.KEY_CODEC to codec.name.lowercase(),
+        FlutterContract.KEY_TARGET_HEIGHT to targetHeight,
+        FlutterContract.KEY_TARGET_BITRATE to targetBitrate,
+        FlutterContract.KEY_ATTEMPTS to attempts,
+        FlutterContract.KEY_USED_ORIGINAL_SOURCE to usedOriginalSource,
     )
 }
 
+private fun Map<*, *>.stringOrNull(key: String): String? = get(key) as? String
+
+private fun String.toPlatformFile(): File {
+    return if (startsWith("file://")) {
+        File(requireNotNull(Uri.parse(this).path) { "Invalid file URI: $this" })
+    } else {
+        File(this)
+    }
+}
+
+private object FlutterContract {
+    const val METHODS_CHANNEL = "vidsqueeze/methods"
+    const val EVENTS_CHANNEL = "vidsqueeze/events"
+
+    const val METHOD_COMPRESS = "compress"
+    const val METHOD_CANCEL = "cancel"
+
+    const val KEY_TASK_ID = "taskId"
+    const val KEY_INPUT_PATH = "inputPath"
+    const val KEY_OUTPUT_DIRECTORY_PATH = "outputDirectoryPath"
+    const val KEY_OUTPUT_FILE_NAME = "outputFileName"
+    const val KEY_PRESET = "preset"
+    const val KEY_MAX_RESOLUTION_CAP = "maxResolutionCap"
+    const val KEY_ALLOW_HEVC = "allowHevc"
+    const val KEY_KEEP_AUDIO = "keepAudio"
+    const val KEY_KEEP_ORIGINAL_IF_LARGER = "keepOriginalIfLarger"
+    const val KEY_FORCE_CODEC = "forceCodec"
+    const val KEY_MAX_BITRATE = "maxBitrate"
+    const val KEY_PROGRESS_INTERVAL_MS = "progressIntervalMs"
+    const val KEY_PHASE = "phase"
+    const val KEY_PROGRESS_PERCENT = "progressPercent"
+    const val KEY_CODE = "code"
+    const val KEY_MESSAGE = "message"
+    const val KEY_OUTPUT_PATH = "outputPath"
+    const val KEY_OUTPUT_SIZE_BYTES = "outputSizeBytes"
+    const val KEY_SOURCE_SIZE_BYTES = "sourceSizeBytes"
+    const val KEY_DURATION_MS = "durationMs"
+    const val KEY_CODEC = "codec"
+    const val KEY_TARGET_HEIGHT = "targetHeight"
+    const val KEY_TARGET_BITRATE = "targetBitrate"
+    const val KEY_ATTEMPTS = "attempts"
+    const val KEY_USED_ORIGINAL_SOURCE = "usedOriginalSource"
+
+    const val PHASE_PREPARING = "preparing"
+    const val PHASE_TRANSCODING = "transcoding"
+    const val PHASE_FINALIZING = "finalizing"
+    const val PHASE_COMPLETED = "completed"
+    const val PHASE_FAILED = "failed"
+    const val PHASE_CANCELLED = "cancelled"
+
+    const val ERROR_BUSY = "busy"
+    const val ERROR_BAD_ARGS = "bad_args"
+    const val ERROR_BAD_REQUEST = "bad_request"
+    const val ERROR_NO_CONTEXT = "no_context"
+    const val ERROR_NO_COMPRESSOR = "no_compressor"
+}

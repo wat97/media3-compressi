@@ -1,0 +1,503 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A1B2C3D13C4D5E6F708090A1 /* VidsqueezeSampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D03C4D5E6F708090A1 /* VidsqueezeSampleApp.swift */; };
+		A1B2C3D53C4D5E6F708090A1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D23C4D5E6F708090A1 /* Assets.xcassets */; };
+		A1B2C3E03C4D5E6F708090A1 /* VidsqueezeCapabilityResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3DF3C4D5E6F708090A1 /* VidsqueezeCapabilityResolver.swift */; };
+		A1B2C3E23C4D5E6F708090A1 /* VidsqueezeCompressionModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3E13C4D5E6F708090A1 /* VidsqueezeCompressionModels.swift */; };
+		A1B2C3E43C4D5E6F708090A1 /* VidsqueezeCompressionPolicyEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3E33C4D5E6F708090A1 /* VidsqueezeCompressionPolicyEngine.swift */; };
+		A1B2C3E63C4D5E6F708090A1 /* VidsqueezeErrorClassifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3E53C4D5E6F708090A1 /* VidsqueezeErrorClassifier.swift */; };
+		A1B2C3E83C4D5E6F708090A1 /* VidsqueezeFallbackPlanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3E73C4D5E6F708090A1 /* VidsqueezeFallbackPlanner.swift */; };
+		A1B2C3EA3C4D5E6F708090A1 /* VidsqueezeOutputValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3E93C4D5E6F708090A1 /* VidsqueezeOutputValidator.swift */; };
+		A1B2C3EE3C4D5E6F708090A1 /* VidsqueezeSourceInspector.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3ED3C4D5E6F708090A1 /* VidsqueezeSourceInspector.swift */; };
+		A1B2C3F03C4D5E6F708090A1 /* VidsqueezeVideoCompressor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3EF3C4D5E6F708090A1 /* VidsqueezeVideoCompressor.swift */; };
+		A1B2C4013C4D5E6F708090A1 /* CompressionBenchmarkModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C4003C4D5E6F708090A1 /* CompressionBenchmarkModels.swift */; };
+		A1B2C4033C4D5E6F708090A1 /* CompressionOptionModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C4023C4D5E6F708090A1 /* CompressionOptionModels.swift */; };
+		A1B2C4053C4D5E6F708090A1 /* MediaInspectorFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C4043C4D5E6F708090A1 /* MediaInspectorFormatter.swift */; };
+		A1B2C4073C4D5E6F708090A1 /* FileImportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C4063C4D5E6F708090A1 /* FileImportService.swift */; };
+		A1B2C4093C4D5E6F708090A1 /* PhotoImportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C4083C4D5E6F708090A1 /* PhotoImportService.swift */; };
+		A1B2C40B3C4D5E6F708090A1 /* DocumentPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C40A3C4D5E6F708090A1 /* DocumentPicker.swift */; };
+		A1B2C40D3C4D5E6F708090A1 /* PhotoPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C40C3C4D5E6F708090A1 /* PhotoPicker.swift */; };
+		A1B2C40F3C4D5E6F708090A1 /* CompressionSessionAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C40E3C4D5E6F708090A1 /* CompressionSessionAdapter.swift */; };
+		A1B2C4113C4D5E6F708090A1 /* CompressionHarnessViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C4103C4D5E6F708090A1 /* CompressionHarnessViewModel.swift */; };
+		A1B2C4133C4D5E6F708090A1 /* CompressionHarnessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C4123C4D5E6F708090A1 /* CompressionHarnessView.swift */; };
+		A1B2C4153C4D5E6F708090A1 /* CompressionHarnessViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C4143C4D5E6F708090A1 /* CompressionHarnessViewModelTests.swift */; };
+		A1B2C4173C4D5E6F708090A1 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1B2C4163C4D5E6F708090A1 /* XCTest.framework */; };
+		A1B2C4263C4D5E6F708090A1 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C4273C4D5E6F708090A1 /* LaunchScreen.storyboard */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		A1B2C4243C4D5E6F708090A1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A1B2C3C53C4D5E6F708090A1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A1B2C3D43C4D5E6F708090A1;
+			remoteInfo = "vidsqueeze-sample";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		A1B2C3CD3C4D5E6F708090A1 /* vidsqueeze-sample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "vidsqueeze-sample.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A1B2C3D03C4D5E6F708090A1 /* VidsqueezeSampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VidsqueezeSampleApp.swift; sourceTree = "<group>"; };
+		A1B2C3D13C4D5E6F708090B1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A1B2C3D23C4D5E6F708090A1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A1B2C3DF3C4D5E6F708090A1 /* VidsqueezeCapabilityResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = VidsqueezeCapabilityResolver.swift; path = ../Classes/VidsqueezeCapabilityResolver.swift; sourceTree = SOURCE_ROOT; };
+		A1B2C3E13C4D5E6F708090A1 /* VidsqueezeCompressionModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = VidsqueezeCompressionModels.swift; path = ../Classes/VidsqueezeCompressionModels.swift; sourceTree = SOURCE_ROOT; };
+		A1B2C3E33C4D5E6F708090A1 /* VidsqueezeCompressionPolicyEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = VidsqueezeCompressionPolicyEngine.swift; path = ../Classes/VidsqueezeCompressionPolicyEngine.swift; sourceTree = SOURCE_ROOT; };
+		A1B2C3E53C4D5E6F708090A1 /* VidsqueezeErrorClassifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = VidsqueezeErrorClassifier.swift; path = ../Classes/VidsqueezeErrorClassifier.swift; sourceTree = SOURCE_ROOT; };
+		A1B2C3E73C4D5E6F708090A1 /* VidsqueezeFallbackPlanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = VidsqueezeFallbackPlanner.swift; path = ../Classes/VidsqueezeFallbackPlanner.swift; sourceTree = SOURCE_ROOT; };
+		A1B2C3E93C4D5E6F708090A1 /* VidsqueezeOutputValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = VidsqueezeOutputValidator.swift; path = ../Classes/VidsqueezeOutputValidator.swift; sourceTree = SOURCE_ROOT; };
+		A1B2C3ED3C4D5E6F708090A1 /* VidsqueezeSourceInspector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = VidsqueezeSourceInspector.swift; path = ../Classes/VidsqueezeSourceInspector.swift; sourceTree = SOURCE_ROOT; };
+		A1B2C3EF3C4D5E6F708090A1 /* VidsqueezeVideoCompressor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = VidsqueezeVideoCompressor.swift; path = ../Classes/VidsqueezeVideoCompressor.swift; sourceTree = SOURCE_ROOT; };
+		A1B2C4003C4D5E6F708090A1 /* CompressionBenchmarkModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionBenchmarkModels.swift; sourceTree = "<group>"; };
+		A1B2C4023C4D5E6F708090A1 /* CompressionOptionModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionOptionModels.swift; sourceTree = "<group>"; };
+		A1B2C4043C4D5E6F708090A1 /* MediaInspectorFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaInspectorFormatter.swift; sourceTree = "<group>"; };
+		A1B2C4063C4D5E6F708090A1 /* FileImportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileImportService.swift; sourceTree = "<group>"; };
+		A1B2C4083C4D5E6F708090A1 /* PhotoImportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoImportService.swift; sourceTree = "<group>"; };
+		A1B2C40A3C4D5E6F708090A1 /* DocumentPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentPicker.swift; sourceTree = "<group>"; };
+		A1B2C40C3C4D5E6F708090A1 /* PhotoPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPicker.swift; sourceTree = "<group>"; };
+		A1B2C40E3C4D5E6F708090A1 /* CompressionSessionAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionSessionAdapter.swift; sourceTree = "<group>"; };
+		A1B2C4103C4D5E6F708090A1 /* CompressionHarnessViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionHarnessViewModel.swift; sourceTree = "<group>"; };
+		A1B2C4123C4D5E6F708090A1 /* CompressionHarnessView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionHarnessView.swift; sourceTree = "<group>"; };
+		A1B2C4143C4D5E6F708090A1 /* CompressionHarnessViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionHarnessViewModelTests.swift; sourceTree = "<group>"; };
+		A1B2C4163C4D5E6F708090A1 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = System/Library/Frameworks/XCTest.framework; sourceTree = SDKROOT; };
+		A1B2C4183C4D5E6F708090A1 /* vidsqueeze-sampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "vidsqueeze-sampleTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A1B2C4273C4D5E6F708090A1 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A1B2C3D73C4D5E6F708090A1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A1B2C41A3C4D5E6F708090A1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1B2C4173C4D5E6F708090A1 /* XCTest.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A1B2C3C43C4D5E6F708090A1 = {
+			isa = PBXGroup;
+			children = (
+				A1B2C3CE3C4D5E6F708090A1 /* Sources */,
+				A1B2C4193C4D5E6F708090A1 /* Tests */,
+				A1B2C3D63C4D5E6F708090A1 /* NativeCore */,
+				A1B2C3D33C4D5E6F708090A1 /* Assets */,
+				A1B2C41B3C4D5E6F708090A1 /* Frameworks */,
+				A1B2C3CC3C4D5E6F708090A1 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A1B2C3CC3C4D5E6F708090A1 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A1B2C3CD3C4D5E6F708090A1 /* vidsqueeze-sample.app */,
+				A1B2C4183C4D5E6F708090A1 /* vidsqueeze-sampleTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A1B2C3CE3C4D5E6F708090A1 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				A1B2C3D03C4D5E6F708090A1 /* VidsqueezeSampleApp.swift */,
+				A1B2C4123C4D5E6F708090A1 /* CompressionHarnessView.swift */,
+				A1B2C4103C4D5E6F708090A1 /* CompressionHarnessViewModel.swift */,
+				A1B2C40E3C4D5E6F708090A1 /* CompressionSessionAdapter.swift */,
+				A1B2C4003C4D5E6F708090A1 /* CompressionBenchmarkModels.swift */,
+				A1B2C4023C4D5E6F708090A1 /* CompressionOptionModels.swift */,
+				A1B2C4043C4D5E6F708090A1 /* MediaInspectorFormatter.swift */,
+				A1B2C4063C4D5E6F708090A1 /* FileImportService.swift */,
+				A1B2C4083C4D5E6F708090A1 /* PhotoImportService.swift */,
+				A1B2C40A3C4D5E6F708090A1 /* DocumentPicker.swift */,
+				A1B2C40C3C4D5E6F708090A1 /* PhotoPicker.swift */,
+				A1B2C4273C4D5E6F708090A1 /* LaunchScreen.storyboard */,
+				A1B2C3D13C4D5E6F708090B1 /* Info.plist */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		A1B2C4193C4D5E6F708090A1 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				A1B2C4143C4D5E6F708090A1 /* CompressionHarnessViewModelTests.swift */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
+		A1B2C41B3C4D5E6F708090A1 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				A1B2C4163C4D5E6F708090A1 /* XCTest.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		A1B2C3D33C4D5E6F708090A1 /* Assets */ = {
+			isa = PBXGroup;
+			children = (
+				A1B2C3D23C4D5E6F708090A1 /* Assets.xcassets */,
+			);
+			sourceTree = "<group>";
+		};
+		A1B2C3D63C4D5E6F708090A1 /* NativeCore */ = {
+			isa = PBXGroup;
+			children = (
+				A1B2C3DF3C4D5E6F708090A1 /* VidsqueezeCapabilityResolver.swift */,
+				A1B2C3E13C4D5E6F708090A1 /* VidsqueezeCompressionModels.swift */,
+				A1B2C3E33C4D5E6F708090A1 /* VidsqueezeCompressionPolicyEngine.swift */,
+				A1B2C3E53C4D5E6F708090A1 /* VidsqueezeErrorClassifier.swift */,
+				A1B2C3E73C4D5E6F708090A1 /* VidsqueezeFallbackPlanner.swift */,
+				A1B2C3E93C4D5E6F708090A1 /* VidsqueezeOutputValidator.swift */,
+				A1B2C3ED3C4D5E6F708090A1 /* VidsqueezeSourceInspector.swift */,
+				A1B2C3EF3C4D5E6F708090A1 /* VidsqueezeVideoCompressor.swift */,
+			);
+			name = NativeCore;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A1B2C3D43C4D5E6F708090A1 /* vidsqueeze-sample */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A1B2C3DB3C4D5E6F708090A1 /* Build configuration list for PBXNativeTarget "vidsqueeze-sample" */;
+			buildPhases = (
+				A1B2C3D53C4D5E6F708090B1 /* Sources */,
+				A1B2C3D73C4D5E6F708090A1 /* Frameworks */,
+				A1B2C3D83C4D5E6F708090A1 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "vidsqueeze-sample";
+			productName = "vidsqueeze-sample";
+			productReference = A1B2C3CD3C4D5E6F708090A1 /* vidsqueeze-sample.app */;
+			productType = "com.apple.product-type.application";
+		};
+		A1B2C41C3C4D5E6F708090A1 /* vidsqueeze-sampleTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A1B2C4213C4D5E6F708090A1 /* Build configuration list for PBXNativeTarget "vidsqueeze-sampleTests" */;
+			buildPhases = (
+				A1B2C41D3C4D5E6F708090A1 /* Sources */,
+				A1B2C41A3C4D5E6F708090A1 /* Frameworks */,
+				A1B2C41E3C4D5E6F708090A1 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A1B2C4253C4D5E6F708090A1 /* PBXTargetDependency */,
+			);
+			name = "vidsqueeze-sampleTests";
+			productName = "vidsqueeze-sampleTests";
+			productReference = A1B2C4183C4D5E6F708090A1 /* vidsqueeze-sampleTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A1B2C3C53C4D5E6F708090A1 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					A1B2C3D43C4D5E6F708090A1 = {
+						CreatedOnToolsVersion = 16.0;
+					};
+				};
+			};
+			buildConfigurationList = A1B2C3C83C4D5E6F708090A1 /* Build configuration list for PBXProject "vidsqueeze-sample" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = A1B2C3C43C4D5E6F708090A1;
+			productRefGroup = A1B2C3CC3C4D5E6F708090A1 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A1B2C3D43C4D5E6F708090A1 /* vidsqueeze-sample */,
+				A1B2C41C3C4D5E6F708090A1 /* vidsqueeze-sampleTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A1B2C3D83C4D5E6F708090A1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1B2C3D53C4D5E6F708090A1 /* Assets.xcassets in Resources */,
+				A1B2C4263C4D5E6F708090A1 /* LaunchScreen.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A1B2C41E3C4D5E6F708090A1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A1B2C3D53C4D5E6F708090B1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1B2C3D13C4D5E6F708090A1 /* VidsqueezeSampleApp.swift in Sources */,
+				A1B2C4133C4D5E6F708090A1 /* CompressionHarnessView.swift in Sources */,
+				A1B2C4113C4D5E6F708090A1 /* CompressionHarnessViewModel.swift in Sources */,
+				A1B2C40F3C4D5E6F708090A1 /* CompressionSessionAdapter.swift in Sources */,
+				A1B2C4013C4D5E6F708090A1 /* CompressionBenchmarkModels.swift in Sources */,
+				A1B2C4033C4D5E6F708090A1 /* CompressionOptionModels.swift in Sources */,
+				A1B2C4053C4D5E6F708090A1 /* MediaInspectorFormatter.swift in Sources */,
+				A1B2C4073C4D5E6F708090A1 /* FileImportService.swift in Sources */,
+				A1B2C4093C4D5E6F708090A1 /* PhotoImportService.swift in Sources */,
+				A1B2C40B3C4D5E6F708090A1 /* DocumentPicker.swift in Sources */,
+				A1B2C40D3C4D5E6F708090A1 /* PhotoPicker.swift in Sources */,
+				A1B2C3E03C4D5E6F708090A1 /* VidsqueezeCapabilityResolver.swift in Sources */,
+				A1B2C3E23C4D5E6F708090A1 /* VidsqueezeCompressionModels.swift in Sources */,
+				A1B2C3E43C4D5E6F708090A1 /* VidsqueezeCompressionPolicyEngine.swift in Sources */,
+				A1B2C3E63C4D5E6F708090A1 /* VidsqueezeErrorClassifier.swift in Sources */,
+				A1B2C3E83C4D5E6F708090A1 /* VidsqueezeFallbackPlanner.swift in Sources */,
+				A1B2C3EA3C4D5E6F708090A1 /* VidsqueezeOutputValidator.swift in Sources */,
+				A1B2C3EE3C4D5E6F708090A1 /* VidsqueezeSourceInspector.swift in Sources */,
+				A1B2C3F03C4D5E6F708090A1 /* VidsqueezeVideoCompressor.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A1B2C41D3C4D5E6F708090A1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1B2C4153C4D5E6F708090A1 /* CompressionHarnessViewModelTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A1B2C4253C4D5E6F708090A1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A1B2C3D43C4D5E6F708090A1 /* vidsqueeze-sample */;
+			targetProxy = A1B2C4243C4D5E6F708090A1 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		A1B2C3D93C4D5E6F708090A1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_TESTABILITY = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Sources/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.enb.vidsqueeze.sample;
+				PRODUCT_MODULE_NAME = vidsqueeze_sample;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A1B2C3DA3C4D5E6F708090A1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Sources/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.enb.vidsqueeze.sample;
+				PRODUCT_MODULE_NAME = vidsqueeze_sample;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		A1B2C41F3C4D5E6F708090A1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CLANG_ENABLE_MODULES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@loader_path/Frameworks",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = dev.enb.vidsqueeze.sample.tests;
+				PRODUCT_MODULE_NAME = vidsqueeze_sampleTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/vidsqueeze-sample.app/vidsqueeze-sample";
+			};
+			name = Debug;
+		};
+		A1B2C4203C4D5E6F708090A1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CLANG_ENABLE_MODULES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@loader_path/Frameworks",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = dev.enb.vidsqueeze.sample.tests;
+				PRODUCT_MODULE_NAME = vidsqueeze_sampleTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/vidsqueeze-sample.app/vidsqueeze-sample";
+			};
+			name = Release;
+		};
+		A1B2C3DC3C4D5E6F708090A1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+			};
+			name = Debug;
+		};
+		A1B2C3DD3C4D5E6F708090A1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A1B2C3C83C4D5E6F708090A1 /* Build configuration list for PBXProject "vidsqueeze-sample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A1B2C3DC3C4D5E6F708090A1 /* Debug */,
+				A1B2C3DD3C4D5E6F708090A1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A1B2C3DB3C4D5E6F708090A1 /* Build configuration list for PBXNativeTarget "vidsqueeze-sample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A1B2C3D93C4D5E6F708090A1 /* Debug */,
+				A1B2C3DA3C4D5E6F708090A1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A1B2C4213C4D5E6F708090A1 /* Build configuration list for PBXNativeTarget "vidsqueeze-sampleTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A1B2C41F3C4D5E6F708090A1 /* Debug */,
+				A1B2C4203C4D5E6F708090A1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A1B2C3C53C4D5E6F708090A1 /* Project object */;
+}

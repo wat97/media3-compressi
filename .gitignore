@@ -21,3 +21,5 @@ android/.gradle/
 ios/Pods/
 ios/.symlinks/
 ios/.build/
+.xcodebuild/
+ios/SampleApp/build/

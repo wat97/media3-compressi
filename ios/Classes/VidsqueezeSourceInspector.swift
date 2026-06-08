@@ -50,7 +50,12 @@ final class VidsqueezeSourceInspector {
         let isDolbyVision = subtype == FourCharCode("dvh1") || subtype == FourCharCode("dvhe")
         let extensions = (CMFormatDescriptionGetExtensions(formatDescription) as NSDictionary?) ?? [:]
 
-        let bitsPerComponent = (extensions[kCMFormatDescriptionExtension_BitsPerComponent] as? NSNumber)?.intValue
+        let bitsPerComponent: Int? = {
+            if #available(iOS 15.0, *) {
+                return (extensions[kCMFormatDescriptionExtension_BitsPerComponent] as? NSNumber)?.intValue
+            }
+            return nil
+        }()
         let transferFunction = extensions[kCVImageBufferTransferFunctionKey] as? String
         let colorPrimaries = extensions[kCVImageBufferColorPrimariesKey] as? String
 

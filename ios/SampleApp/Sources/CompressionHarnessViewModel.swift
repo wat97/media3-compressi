@@ -2,13 +2,25 @@ import Combine
 import Foundation
 import PhotosUI
 
+protocol FileImporting: Sendable {
+    func importVideo(from url: URL) throws -> URL
+}
+
+extension FileImportService: FileImporting {}
+
+protocol PhotoImporting: Sendable {
+    func importVideo(from result: PHPickerResult, completion: @escaping (Result<URL, Error>) -> Void)
+}
+
+extension PhotoImportService: PhotoImporting {}
+
 protocol CompressionStarting {
     func start(request: VidsqueezeCompressionRequest, listener: VidsqueezeCompressionListener) -> VidsqueezeCompressionHandle
 }
 
 extension VidsqueezeVideoCompressor: CompressionStarting {}
 
-protocol SourceInspecting {
+protocol SourceInspecting: Sendable {
     func inspect(url: URL) throws -> VidsqueezeSourceVideoInfo
 }
 
@@ -30,14 +42,16 @@ final class CompressionHarnessViewModel: ObservableObject {
     @Published var phaseLabel = "Idle"
     @Published var progressPercent = 0
     @Published var isCompressing = false
+    @Published var isLoadingSource = false
+    @Published var sourceLoadingMessage = ""
     @Published var errorMessage: String?
     @Published var logLines: [String] = []
     @Published var selectedSourceLabel = "No source selected"
 
     private let compressor: CompressionStarting
     private let inspector: SourceInspecting
-    private let fileImportService: FileImportService
-    private let photoImportService: PhotoImportService
+    private let fileImportService: FileImporting
+    private let photoImportService: PhotoImporting
     private let fileManager: FileManager
     private var sourceURL: URL?
     private var sessionAdapter: CompressionSessionAdapting?
@@ -45,8 +59,8 @@ final class CompressionHarnessViewModel: ObservableObject {
     init(
         compressor: CompressionStarting = VidsqueezeVideoCompressor(),
         inspector: SourceInspecting = VidsqueezeSourceInspector(),
-        fileImportService: FileImportService = FileImportService(),
-        photoImportService: PhotoImportService = PhotoImportService(),
+        fileImportService: FileImporting = FileImportService(),
+        photoImportService: PhotoImporting = PhotoImportService(),
         fileManager: FileManager = .default
     ) {
         self.compressor = compressor
@@ -57,22 +71,28 @@ final class CompressionHarnessViewModel: ObservableObject {
     }
 
     func importFromDocument(url: URL) {
-        do {
-            let localURL = try fileImportService.importVideo(from: url)
-            try loadSource(from: localURL, origin: "Files")
-        } catch {
-            present(error: error)
+        beginSourceLoading(message: "Importing from Files...")
+        Task {
+            do {
+                let localURL = try await importDocument(url: url)
+                updateSourceLoadingMessage("Reading video info...")
+                try await loadSource(from: localURL, origin: "Files")
+            } catch {
+                present(error: error)
+            }
         }
     }
 
     func importFromPhoto(result: PHPickerResult?) {
         guard let result else { return }
+        beginSourceLoading(message: "Importing from Photos...")
         photoImportService.importVideo(from: result) { [weak self] outcome in
-            Task { @MainActor in
+            Task {
                 guard let self else { return }
                 do {
                     let localURL = try outcome.get()
-                    try self.loadSource(from: localURL, origin: "Photos")
+                    self.updateSourceLoadingMessage("Reading video info...")
+                    try await self.loadSource(from: localURL, origin: "Photos")
                 } catch {
                     self.present(error: error)
                 }
@@ -153,8 +173,8 @@ final class CompressionHarnessViewModel: ObservableObject {
         Int(progressIntervalMsText.trimmingCharacters(in: .whitespacesAndNewlines)) ?? 250
     }
 
-    private func loadSource(from url: URL, origin: String) throws {
-        let info = try inspector.inspect(url: url)
+    private func loadSource(from url: URL, origin: String) async throws {
+        let info = try await inspectSource(url: url)
         sourceURL = url
         sourceSummary = CompressionMediaSummary(
             fileName: url.lastPathComponent,
@@ -171,6 +191,8 @@ final class CompressionHarnessViewModel: ObservableObject {
         phaseLabel = "Ready"
         progressPercent = 0
         selectedSourceLabel = "\(origin): \(url.lastPathComponent)"
+        isLoadingSource = false
+        sourceLoadingMessage = ""
         appendLog("Imported from \(origin): \(url.lastPathComponent)")
     }
 
@@ -252,9 +274,53 @@ final class CompressionHarnessViewModel: ObservableObject {
 
     private func present(error: Error) {
         isCompressing = false
+        isLoadingSource = false
+        sourceLoadingMessage = ""
         sessionAdapter = nil
         errorMessage = error.localizedDescription
         appendLog("Error: \(error.localizedDescription)")
+    }
+
+    private func beginSourceLoading(message: String) {
+        isLoadingSource = true
+        sourceLoadingMessage = message
+        errorMessage = nil
+        phaseLabel = "Loading Source"
+        progressPercent = 0
+        appendLog(message)
+    }
+
+    private func updateSourceLoadingMessage(_ message: String) {
+        sourceLoadingMessage = message
+        appendLog(message)
+    }
+
+    private func importDocument(url: URL) async throws -> URL {
+        let service = fileImportService
+        return try await withCheckedThrowingContinuation { continuation in
+            DispatchQueue.global(qos: .userInitiated).async {
+                do {
+                    let localURL = try service.importVideo(from: url)
+                    continuation.resume(returning: localURL)
+                } catch {
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
+    }
+
+    private func inspectSource(url: URL) async throws -> VidsqueezeSourceVideoInfo {
+        let inspector = inspector
+        return try await withCheckedThrowingContinuation { continuation in
+            DispatchQueue.global(qos: .userInitiated).async {
+                do {
+                    let info = try inspector.inspect(url: url)
+                    continuation.resume(returning: info)
+                } catch {
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
     }
 
     private func appendLog(_ line: String) {

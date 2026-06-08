@@ -3,7 +3,7 @@ import CoreMedia
 import CoreVideo
 import Foundation
 
-final class VidsqueezeSourceInspector {
+final class VidsqueezeSourceInspector: @unchecked Sendable {
     func inspect(url: URL) throws -> VidsqueezeSourceVideoInfo {
         guard url.isFileURL else {
             throw VidsqueezeCompressionFailure(code: .unsupportedInput, message: "Only local file URLs are supported")

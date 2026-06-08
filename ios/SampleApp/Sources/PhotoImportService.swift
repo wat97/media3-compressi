@@ -16,7 +16,7 @@ enum PhotoImportServiceError: LocalizedError {
     }
 }
 
-final class PhotoImportService {
+final class PhotoImportService: @unchecked Sendable {
     private let fileManager: FileManager
 
     init(fileManager: FileManager = .default) {

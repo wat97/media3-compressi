@@ -7,16 +7,27 @@ struct CompressionHarnessView: View {
 
     var body: some View {
         NavigationView {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    sourceSection
-                    controlSection
-                    progressSection
-                    summarySection
-                    logSection
+            ZStack {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 20) {
+                        sourceSection
+                        controlSection
+                        progressSection
+                        summarySection
+                        logSection
+                    }
+                    .padding(20)
                 }
-                .padding(20)
+                .disabled(viewModel.isLoadingSource)
+                .blur(radius: viewModel.isLoadingSource ? 2 : 0)
+
+                if viewModel.isLoadingSource {
+                    sourceLoadingOverlay
+                        .transition(.opacity)
+                        .zIndex(1)
+                }
             }
+            .animation(.easeInOut(duration: 0.2), value: viewModel.isLoadingSource)
             .navigationTitle("Native Harness")
             .alert(isPresented: Binding(
                 get: { viewModel.errorMessage != nil },
@@ -45,6 +56,36 @@ struct CompressionHarnessView: View {
         }
     }
 
+    private var sourceLoadingOverlay: some View {
+        ZStack {
+            Color.black.opacity(0.18)
+                .ignoresSafeArea()
+
+            VStack(spacing: 12) {
+                ProgressView()
+                    .scaleEffect(1.15)
+                Text("Loading source")
+                    .font(.headline)
+                Text(viewModel.sourceLoadingMessage)
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+            }
+            .padding(.horizontal, 24)
+            .padding(.vertical, 20)
+            .background(
+                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                    .fill(Color(.secondarySystemBackground).opacity(0.96))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                    .stroke(Color.black.opacity(0.06), lineWidth: 1)
+            )
+            .shadow(color: .black.opacity(0.12), radius: 16, y: 8)
+            .padding(24)
+        }
+    }
+
     private var sourceSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             sectionTitle("Source")
@@ -57,11 +98,13 @@ struct CompressionHarnessView: View {
                     showsDocumentPicker = true
                 }
                 .buttonStyle(HarnessPrimaryButtonStyle())
+                .disabled(viewModel.isLoadingSource)
 
                 Button("Pick From Photos") {
                     showsPhotoPicker = true
                 }
                 .buttonStyle(HarnessSecondaryButtonStyle())
+                .disabled(viewModel.isLoadingSource)
             }
 
             if let source = viewModel.sourceSummary {
@@ -73,6 +116,7 @@ struct CompressionHarnessView: View {
                     metricRow("Audio", source.hasAudio ? "Keepable" : "No audio")
                     metricRow("Size", MediaInspectorFormatter.megabytes(source.sizeBytes))
                 }
+                .opacity(viewModel.isLoadingSource ? 0.45 : 1)
             }
         }
     }
@@ -81,23 +125,22 @@ struct CompressionHarnessView: View {
         VStack(alignment: .leading, spacing: 12) {
             sectionTitle("Compression Controls")
 
-            Picker("Preset", selection: $viewModel.selectedPreset) {
-                ForEach(CompressionPresetOption.allCases) { option in
-                    Text(option.title).tag(option)
-                }
-            }
-            .pickerStyle(.segmented)
-
-            Picker("Resolution Cap", selection: $viewModel.selectedResolutionCap) {
-                ForEach(ResolutionCapOption.allCases) { option in
-                    Text(option.title).tag(option)
-                }
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Preset")
+                    .font(.subheadline.weight(.semibold))
+                presetSelector
             }
 
-            Picker("Codec", selection: $viewModel.selectedCodec) {
-                ForEach(ForceCodecOption.allCases) { option in
-                    Text(option.title).tag(option)
-                }
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Resolution Cap")
+                    .font(.subheadline.weight(.semibold))
+                resolutionPicker
+            }
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Codec")
+                    .font(.subheadline.weight(.semibold))
+                codecPicker
             }
 
             Toggle("Allow HEVC", isOn: $viewModel.allowHevc)
@@ -127,6 +170,58 @@ struct CompressionHarnessView: View {
                 .disabled(!viewModel.isCompressing)
             }
         }
+    }
+
+    private var presetSelector: some View {
+        HStack(spacing: 8) {
+            ForEach(CompressionPresetOption.allCases) { option in
+                Button {
+                    viewModel.selectedPreset = option
+                } label: {
+                    Text(option.title)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundColor(viewModel.selectedPreset == option ? .white : .primary)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 10)
+                        .padding(.horizontal, 12)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                .fill(viewModel.selectedPreset == option ? Color.blue : Color(.systemGray5))
+                        )
+                }
+                .buttonStyle(.plain)
+            }
+        }
+    }
+
+    private var resolutionPicker: some View {
+        Picker("Resolution Cap", selection: $viewModel.selectedResolutionCap) {
+            ForEach(ResolutionCapOption.allCases) { option in
+                Text(option.title).tag(option)
+            }
+        }
+        .pickerStyle(.menu)
+        .labelsHidden()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
+        .background(Color(.secondarySystemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+
+    private var codecPicker: some View {
+        Picker("Codec", selection: $viewModel.selectedCodec) {
+            ForEach(ForceCodecOption.allCases) { option in
+                Text(option.title).tag(option)
+            }
+        }
+        .pickerStyle(.menu)
+        .labelsHidden()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
+        .background(Color(.secondarySystemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 
     private var progressSection: some View {

@@ -4,7 +4,11 @@
 
 - Initial `vidsqueeze` Flutter plugin scaffolding
 - Added Dart compression API contract
-- Added Android plugin bridge skeleton over existing `compressor-core`
-- Added iOS core parity scaffolding for `iOS 14+`
+- Added Flutter method-channel and event-channel surface
+- Added Android plugin bridge over existing `compressor-core`
+- Added iOS plugin bridge over native `AVAssetReader` / `AVAssetWriter` engine
+- Added contract alignment for Flutter, Android, and iOS bridge payloads
+- Added Dart-side request validation
+- Added Flutter example scaffold with end-to-end compression flow
+- Added native iOS sample harness for direct engine validation
 - Kept `sample-app` as internal Android validation harness
-

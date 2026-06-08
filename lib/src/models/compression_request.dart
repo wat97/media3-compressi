@@ -16,7 +16,11 @@ class CompressionRequest {
     this.maxBitrate,
     this.progressIntervalMs = 250,
     this.taskId,
-  });
+  }) : assert(inputPath != ''),
+       assert(outputDirectoryPath != ''),
+       assert(outputFileName == null || outputFileName != ''),
+       assert(maxBitrate == null || maxBitrate > 0),
+       assert(progressIntervalMs > 0);
 
   final String inputPath;
   final String outputDirectoryPath;

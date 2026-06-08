@@ -23,6 +23,34 @@ void main() {
     expect(map['progressIntervalMs'], 200);
   });
 
+  test('compression request asserts invalid values', () {
+    expect(
+      () => CompressionRequest(
+        inputPath: '',
+        outputDirectoryPath: '/tmp/output',
+      ),
+      throwsAssertionError,
+    );
+
+    expect(
+      () => CompressionRequest(
+        inputPath: 'file:///tmp/input.mp4',
+        outputDirectoryPath: '/tmp/output',
+        progressIntervalMs: 0,
+      ),
+      throwsAssertionError,
+    );
+
+    expect(
+      () => CompressionRequest(
+        inputPath: 'file:///tmp/input.mp4',
+        outputDirectoryPath: '/tmp/output',
+        maxBitrate: 0,
+      ),
+      throwsAssertionError,
+    );
+  });
+
   test('compression state deserializes expected values', () {
     final state = CompressionState.fromMap(<Object?, Object?>{
       'taskId': 'task-1',

@@ -96,7 +96,7 @@
 				A1B2C3CE3C4D5E6F708090A1 /* Sources */,
 				A1B2C4193C4D5E6F708090A1 /* Tests */,
 				A1B2C3D63C4D5E6F708090A1 /* NativeCore */,
-				A1B2C3D33C4D5E6F708090A1 /* Assets */,
+				A1B2C3D33C4D5E6F708090A1,
 				A1B2C41B3C4D5E6F708090A1 /* Frameworks */,
 				A1B2C3CC3C4D5E6F708090A1 /* Products */,
 			);
@@ -131,23 +131,7 @@
 			path = Sources;
 			sourceTree = "<group>";
 		};
-		A1B2C4193C4D5E6F708090A1 /* Tests */ = {
-			isa = PBXGroup;
-			children = (
-				A1B2C4143C4D5E6F708090A1 /* CompressionHarnessViewModelTests.swift */,
-			);
-			path = Tests;
-			sourceTree = "<group>";
-		};
-		A1B2C41B3C4D5E6F708090A1 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				A1B2C4163C4D5E6F708090A1 /* XCTest.framework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		A1B2C3D33C4D5E6F708090A1 /* Assets */ = {
+		A1B2C3D33C4D5E6F708090A1 = {
 			isa = PBXGroup;
 			children = (
 				A1B2C3D23C4D5E6F708090A1 /* Assets.xcassets */,
@@ -167,6 +151,22 @@
 				A1B2C3EF3C4D5E6F708090A1 /* VidsqueezeVideoCompressor.swift */,
 			);
 			name = NativeCore;
+			sourceTree = "<group>";
+		};
+		A1B2C4193C4D5E6F708090A1 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				A1B2C4143C4D5E6F708090A1 /* CompressionHarnessViewModelTests.swift */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
+		A1B2C41B3C4D5E6F708090A1 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				A1B2C4163C4D5E6F708090A1 /* XCTest.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -315,8 +315,8 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
-				ENABLE_TESTABILITY = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_TESTABILITY = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Sources/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
@@ -367,62 +367,6 @@
 			};
 			name = Release;
 		};
-		A1B2C41F3C4D5E6F708090A1 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGNING_ALLOWED = NO;
-				CODE_SIGN_STYLE = Automatic;
-				CLANG_ENABLE_MODULES = YES;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@loader_path/Frameworks",
-					"@executable_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = dev.enb.vidsqueeze.sample.tests;
-				PRODUCT_MODULE_NAME = vidsqueeze_sampleTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/vidsqueeze-sample.app/vidsqueeze-sample";
-			};
-			name = Debug;
-		};
-		A1B2C4203C4D5E6F708090A1 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGNING_ALLOWED = NO;
-				CODE_SIGN_STYLE = Automatic;
-				CLANG_ENABLE_MODULES = YES;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@loader_path/Frameworks",
-					"@executable_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = dev.enb.vidsqueeze.sample.tests;
-				PRODUCT_MODULE_NAME = vidsqueeze_sampleTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/vidsqueeze-sample.app/vidsqueeze-sample";
-			};
-			name = Release;
-		};
 		A1B2C3DC3C4D5E6F708090A1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -464,6 +408,66 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		A1B2C41F3C4D5E6F708090A1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@loader_path/Frameworks",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = dev.enb.vidsqueeze.sample.tests;
+				PRODUCT_MODULE_NAME = vidsqueeze_sampleTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/vidsqueeze-sample.app/vidsqueeze-sample";
+			};
+			name = Debug;
+		};
+		A1B2C4203C4D5E6F708090A1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@loader_path/Frameworks",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = dev.enb.vidsqueeze.sample.tests;
+				PRODUCT_MODULE_NAME = vidsqueeze_sampleTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/vidsqueeze-sample.app/vidsqueeze-sample";
 			};
 			name = Release;
 		};

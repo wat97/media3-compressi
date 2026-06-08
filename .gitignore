@@ -23,3 +23,5 @@ ios/.symlinks/
 ios/.build/
 .xcodebuild/
 ios/SampleApp/build/
+ios/SampleApp/**/*.xcuserstate
+ios/SampleApp/**/xcuserdata/

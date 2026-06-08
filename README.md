@@ -9,9 +9,9 @@ Current repo includes:
 - Flutter public API in `lib/`
 - Android Flutter bridge in `android/`
 - iOS Flutter bridge plus native iOS engine in `ios/`
-- Android native engine in `compressor-core/`
+- Android native engine in `android/compressor-core/`
 - Flutter example app in `example/`
-- internal native validation apps in `sample-app/` and `ios/SampleApp/`
+- internal native validation apps in `android/sample-app/` and `ios/SampleApp/`
 
 Current v1 scope:
 
@@ -121,7 +121,7 @@ Dart-side validation:
 
 Native-only harnesses still exist for lower-level validation:
 
-- Android: `sample-app/`
+- Android: `android/sample-app/`
 - iOS: `ios/SampleApp/`
 
 ## Build And Test
@@ -136,8 +136,8 @@ flutter test
 ### Android
 
 ```bash
-./gradlew :compressor-core:testDebugUnitTest
-./gradlew :sample-app:assembleDebug
+./android/workspace/gradlew -p android/workspace :compressor-core:testDebugUnitTest
+./android/workspace/gradlew -p android/workspace :sample-app:assembleDebug
 ```
 
 ### iOS

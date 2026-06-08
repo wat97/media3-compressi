@@ -18,4 +18,5 @@ rootProject.name = "compressi_android"
 
 include(":compressor-core")
 include(":sample-app")
-
+project(":compressor-core").projectDir = file("../compressor-core")
+project(":sample-app").projectDir = file("../sample-app")

@@ -18,6 +18,8 @@ example/.flutter-plugins
 example/.flutter-plugins-dependencies
 example/.pub/
 android/.gradle/
+android/workspace/.gradle/
+android/workspace/local.properties
 ios/Pods/
 ios/.symlinks/
 ios/.build/

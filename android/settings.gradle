@@ -1,4 +1,3 @@
 rootProject.name = 'vidsqueeze_android'
 include ':compressor-core'
-project(':compressor-core').projectDir = file('../compressor-core')
-
+project(':compressor-core').projectDir = file('compressor-core')

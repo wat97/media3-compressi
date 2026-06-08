@@ -16,5 +16,5 @@ flutter run
 
 Current UI is intentionally minimal. For native-core validation:
 
-- Android: use `sample-app`
+- Android: use `android/sample-app`
 - iOS: use `ios/SampleApp`

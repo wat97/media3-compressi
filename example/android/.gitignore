@@ -1,0 +1,12 @@
+/.gradle
+/.kotlin
+/captures/
+/local.properties
+/vidsqueeze_example_android.iml
+GeneratedPluginRegistrant.java
+
+# Remember to never publicly share your keystore.
+# See https://flutter.dev/to/reference-keystore
+key.properties
+**/*.keystore
+**/*.jks

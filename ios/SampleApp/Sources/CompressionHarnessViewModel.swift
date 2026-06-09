@@ -47,6 +47,8 @@ final class CompressionHarnessViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var logLines: [String] = []
     @Published var selectedSourceLabel = "No source selected"
+    @Published var originalPreviewURL: URL?
+    @Published var compressedPreviewURL: URL?
 
     private let compressor: CompressionStarting
     private let inspector: SourceInspecting
@@ -116,6 +118,7 @@ final class CompressionHarnessViewModel: ObservableObject {
             errorMessage = nil
             outputSummary = nil
             benchmarkSummary = nil
+            compressedPreviewURL = nil
             appendLog("Compression started: \(request.outputURL.lastPathComponent)")
 
             let adapter = CompressionSessionAdapter(
@@ -176,6 +179,8 @@ final class CompressionHarnessViewModel: ObservableObject {
     private func loadSource(from url: URL, origin: String) async throws {
         let info = try await inspectSource(url: url)
         sourceURL = url
+        originalPreviewURL = url
+        compressedPreviewURL = nil
         sourceSummary = CompressionMediaSummary(
             fileName: url.lastPathComponent,
             width: info.width,
@@ -247,6 +252,7 @@ final class CompressionHarnessViewModel: ObservableObject {
                 attempts: result.attempts,
                 usedOriginalSource: result.usedOriginalSource
             )
+            compressedPreviewURL = result.outputURL
             phaseLabel = "Completed"
             progressPercent = 100
             appendLog("Compression completed in \(elapsedMs) ms")

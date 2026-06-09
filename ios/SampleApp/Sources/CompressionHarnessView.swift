@@ -1,3 +1,4 @@
+import AVKit
 import SwiftUI
 
 struct CompressionHarnessView: View {
@@ -11,6 +12,7 @@ struct CompressionHarnessView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 20) {
                         sourceSection
+                        previewSection
                         controlSection
                         progressSection
                         summarySection
@@ -172,6 +174,28 @@ struct CompressionHarnessView: View {
         }
     }
 
+    private var previewSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            sectionTitle("Preview")
+
+            VideoPreviewCard(
+                title: "Original",
+                url: viewModel.originalPreviewURL,
+                detail: viewModel.sourceSummary.map {
+                    "\($0.fileName) - \(MediaInspectorFormatter.dimensions(width: $0.width, height: $0.height))"
+                } ?? "Pick a video to preview the source."
+            )
+
+            VideoPreviewCard(
+                title: "Compressed",
+                url: viewModel.compressedPreviewURL,
+                detail: viewModel.outputSummary.map {
+                    "\($0.fileName) - \(MediaInspectorFormatter.dimensions(width: $0.width, height: $0.height))"
+                } ?? "Run compression to preview the output."
+            )
+        }
+    }
+
     private var presetSelector: some View {
         HStack(spacing: 8) {
             ForEach(CompressionPresetOption.allCases) { option in
@@ -327,5 +351,71 @@ private struct HarnessSecondaryButtonStyle: ButtonStyle {
             .padding(.vertical, 10)
             .background(configuration.isPressed ? Color(.systemGray4) : Color(.systemGray5))
             .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+}
+
+private struct VideoPreviewCard: View {
+    let title: String
+    let url: URL?
+    let detail: String
+
+    @State private var player: AVPlayer?
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text(title)
+                    .font(.subheadline.weight(.semibold))
+                Spacer()
+                if url != nil {
+                    Text("Playable")
+                        .font(.caption.weight(.medium))
+                        .foregroundColor(.green)
+                }
+            }
+
+            Group {
+                if let player {
+                    VideoPlayer(player: player)
+                        .frame(height: 220)
+                        .background(Color.black)
+                } else {
+                    ZStack {
+                        Color.black.opacity(0.88)
+                        VStack(spacing: 8) {
+                            Image(systemName: "film")
+                                .font(.title2)
+                            Text("No video yet")
+                                .font(.subheadline.weight(.semibold))
+                        }
+                        .foregroundColor(.white.opacity(0.82))
+                    }
+                    .frame(height: 160)
+                }
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+
+            Text(detail)
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .lineLimit(2)
+        }
+        .padding(14)
+        .background(Color(.secondarySystemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .onAppear {
+            configurePlayer(for: url)
+        }
+        .onChange(of: url) { newURL in
+            configurePlayer(for: newURL)
+        }
+        .onDisappear {
+            player?.pause()
+        }
+    }
+
+    private func configurePlayer(for url: URL?) {
+        player?.pause()
+        player = url.map { AVPlayer(url: $0) }
     }
 }

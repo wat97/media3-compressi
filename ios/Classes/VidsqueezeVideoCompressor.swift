@@ -414,11 +414,14 @@ private final class VidsqueezeCompressionTask: VidsqueezeCompressionHandle, @unc
         instruction.timeRange = CMTimeRange(start: .zero, duration: assetDuration)
 
         let layerInstruction = AVMutableVideoCompositionLayerInstruction(assetTrack: videoTrack)
-        let presentationSize = videoTrack.naturalSize.applying(videoTrack.preferredTransform)
-        let sourceWidth = max(abs(presentationSize.width), 1)
-        let sourceHeight = max(abs(presentationSize.height), 1)
-        let scale = min(renderSize.width / sourceWidth, renderSize.height / sourceHeight)
-        layerInstruction.setTransform(videoTrack.preferredTransform.scaledBy(x: scale, y: scale), at: .zero)
+        layerInstruction.setTransform(
+            VidsqueezeVideoTransformPlanner.makeLayerTransform(
+                preferredTransform: videoTrack.preferredTransform,
+                naturalSize: videoTrack.naturalSize,
+                renderSize: renderSize
+            ),
+            at: .zero
+        )
 
         instruction.layerInstructions = [layerInstruction]
         composition.instructions = [instruction]

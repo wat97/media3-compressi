@@ -1,0 +1,25 @@
+name: video_compress_compare
+description: Local benchmark harness comparing vidsqueeze with video_compress.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.6.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  file_picker: ^8.0.0
+  path_provider: ^2.1.4
+  video_compress:
+    path: vendor/video_compress
+  vidsqueeze:
+    path: ../../
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true

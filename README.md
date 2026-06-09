@@ -1,130 +1,243 @@
 # vidsqueeze
 
-**Flutter video compression plugin** with native Android (Media3) and iOS (AVFoundation) engines.
+Flutter video compression plugin powered by native Android and iOS encoders.
 
-`flutter pub add vidsqueeze`
+`vidsqueeze` keeps the Flutter API small and platform-neutral while delegating
+heavy media work to native engines:
+
+- Android: Jetpack Media3 Transformer with hardware encoder fallback.
+- iOS: AVFoundation (`AVAssetReader` + `AVAssetWriter`) with compatibility
+  fallback.
+- Flutter: method-channel contract, progress stream, request/result models.
+
+Current v1 scope is compression only. No thumbnail API, remote URL input,
+direct `PHAsset` input, background service orchestration, or caller-selected
+container yet.
 
 ---
 
-## Overview
+## Install
 
-Vidsqueeze compresses MP4 video on Android and iOS through Flutter with zero quality-corruption bias.
+```bash
+flutter pub add vidsqueeze
+```
 
-**v1 scope** — compression only, local file/URI input, single active task per plugin instance, progress stream + final result.
+Package is still under active preparation for public release. Until published,
+use a path or git dependency from consuming apps.
 
 ---
 
-## Flutter API
+## Flutter Usage
 
-### Compress
+### Compress Video
 
 ```dart
 final request = CompressionRequest(
   inputPath: 'file:///storage/emulated/0/Movies/input.mp4',
   outputDirectoryPath: '/storage/emulated/0/Movies/Compressed',
+  outputFileName: 'compressed.mp4',
   preset: CompressionPreset.balanced,
   maxResolutionCap: 1080,
   forceCodec: ForceCodec.auto,
   maxBitrate: 3_000_000,
+  allowHevc: true,
   keepAudio: true,
   keepOriginalIfLarger: true,
   progressIntervalMs: 250,
 );
 
 final result = await Vidsqueeze.instance.compress(request);
+
+print(result.outputPath);
+print(result.outputSizeBytes);
 ```
 
-### Track Progress
+### Listen To Progress
 
 ```dart
-Vidsqueeze.instance.states().listen((state) {
-  print('${state.phase.value} ${state.progressPercent}');
+final subscription = Vidsqueeze.instance.states().listen((state) {
+  print('${state.phase.value}: ${state.progressPercent ?? '-'}');
 });
 ```
 
+### Cancel Active Task
+
+```dart
+await Vidsqueeze.instance.cancel();
+```
+
 ---
 
-## Request Contract
+## Public API
 
-| Field | Type | Default | Required |
-|---|---|---|---|
-| `taskId` | `String?` | — | no |
-| `inputPath` | `String` | — | **yes** (non-empty) |
-| `outputDirectoryPath` | `String` | — | **yes** (non-empty) |
-| `outputFileName` | `String?` | `null` | no (non-empty if set) |
-| `preset` | `CompressionPreset` | `balanced` | no |
-| `maxResolutionCap` | `int?` | `null` | no |
-| `forceCodec` | `ForceCodec` | `auto` | no |
-| `maxBitrate` | `int?` | `null` | no (>0 if set) |
-| `allowHevc` | `bool` | `true` | no |
-| `keepAudio` | `bool` | `true` | no |
-| `keepOriginalIfLarger` | `bool` | `true` | no |
-| `progressIntervalMs` | `int` | `250` | no (>0) |
-
-### Public Types
-
-| Type | Role |
+| Type | Purpose |
 |---|---|
-| `Vidsqueeze` | Plugin entry point (singleton) |
-| `CompressionRequest` | Compression parameters |
-| `CompressionResult` | Output path, size, codec, duration |
-| `CompressionState` | Phase + progressPercent |
-| `CompressionPreset` | `balanced`, `quality`, `size` |
+| `Vidsqueeze` | Plugin entry point and state stream owner |
+| `CompressionRequest` | Platform-neutral compression request |
+| `CompressionResult` | Output path, size, codec, duration, attempts |
+| `CompressionState` | Phase and progress event |
+| `CompressionPreset` | `balanced`, `quality`, `smallSize` |
 | `ForceCodec` | `auto`, `avc`, `hevc` |
 
-### Validation
+### Request Fields
 
-- `inputPath` — must be non-empty
-- `outputDirectoryPath` — must be non-empty
-- `outputFileName` — non-empty if provided
-- `maxBitrate` — must be > 0 if provided
-- `progressIntervalMs` — must be > 0
+| Field | Type | Default | Notes |
+|---|---|---|---|
+| `taskId` | `String?` | generated | Optional caller-visible task id |
+| `inputPath` | `String` | required | Local file URI/path depending on platform bridge |
+| `outputDirectoryPath` | `String` | required | Existing/writable output directory |
+| `outputFileName` | `String?` | generated | Must be non-empty when provided |
+| `preset` | `CompressionPreset` | `balanced` | Quality/size policy |
+| `maxResolutionCap` | `int?` | `null` | Target max height, never upscales |
+| `forceCodec` | `ForceCodec` | `auto` | Force AVC/HEVC or use platform policy |
+| `maxBitrate` | `int?` | `null` | Bits per second cap |
+| `allowHevc` | `bool` | `true` | Allows HEVC when safe and supported |
+| `keepAudio` | `bool` | `true` | Keep or remove source audio |
+| `keepOriginalIfLarger` | `bool` | `true` | Return original if compressed file is larger |
+| `progressIntervalMs` | `int` | `250` | Native progress throttle interval |
+
+Validation is intentionally strict: required strings must be non-empty,
+`maxBitrate` must be greater than zero when set, and `progressIntervalMs` must
+be greater than zero.
 
 ---
 
-## Platform Behaviour
+## Native Android
 
-### Android (Media3)
+Android implementation lives in two layers:
 
-| API Range | Default |
+- Flutter plugin wrapper: `android/`
+- Native engine module: `android/compressor-core/`
+- Native validation app: `android/sample-app/`
+- Standalone Gradle runner: `android/workspace/`
+
+### Engine
+
+- Minimum API: 23
+- Core dependency: `androidx.media3:media3-transformer`
+- Encoder path: device hardware codecs through Media3
+- Output container: MP4
+- Default policy: balanced preset, 1080p cap, audio kept, HEVC allowed
+
+### Codec Policy
+
+| Device/API | Preferred path |
 |---|---|
-| 34+ | HEVC when HW encode available |
-| 29–33 | AVC HW encode |
-| 23–28 | AVC with safe caps |
+| Android 14+ | HEVC when hardware encode is safe |
+| Android 10-13 | AVC for broad stability |
+| Android 6-9 | AVC baseline-safe compatibility path |
 
-Resolution policy: never upscale, preserve aspect ratio, cap >1080p → 1080p.
+Android fallback behavior prioritizes valid output over aggressive codec use.
+If preferred HEVC path is unavailable or fails, the engine falls back to AVC
+where policy allows it.
 
-### iOS (AVFoundation)
+### Native Android Harness
 
-- Minimum: iOS 14+
-- Engine: `AVAssetReader` + `AVAssetWriter`
-  - Prefers HEVC when safe
-  - Retries once with AVC on fallback
-- Routes HDR / 10-bit / Dolby Vision sources to compatibility path
+```bash
+./android/workspace/gradlew -p android/workspace :sample-app:installDebug
+```
 
-### Failure Strategy
-
-- Media3 encoder fallback enabled for safe device-driven fallback
-- One app-level retry when preferred codec path fails
-- Output validated before promoting temp file to final destination
-- Domain-level error codes keep Flutter bridge thin
+The harness is intentionally separate from Flutter `example/` and is used for
+low-level Media3 validation on Android devices.
 
 ---
 
-## Example App
+## Native iOS
 
-[`example/`](./example) exercises full Flutter flow:
+iOS implementation lives in:
 
-- pick source video
-- choose preset and request overrides
-- start compression through Flutter bridge
-- observe progress stream
-- inspect final result and output path
+- Flutter plugin wrapper: `ios/`
+- Native Swift core: `ios/Classes/`
+- Native sample harness: `ios/SampleApp/`
 
-Native-only validation harnesses (lower-level, no Flutter in loop):
+### Engine
 
-- Android: [`android/sample-app/`](./android/sample-app)
-- iOS: [`ios/SampleApp/`](./ios/SampleApp)
+- Minimum iOS: 14
+- Core framework: AVFoundation
+- Pipeline: `AVAssetReader` + `AVAssetWriter`
+- Output container: MP4
+- Default policy: balanced preset, 1080p cap, audio kept, HEVC allowed
+
+### Codec Policy
+
+The iOS engine prefers HEVC when safe, supported, and compatible with source
+properties. It falls back to AVC once when policy allows. HDR, 10-bit, and
+Dolby Vision sources are routed through the compatibility path for v1 instead
+of attempting HDR preservation.
+
+### Native iOS Harness
+
+```bash
+xcodebuild build \
+  -project ios/SampleApp/vidsqueeze-sample.xcodeproj \
+  -scheme vidsqueeze-sample \
+  -destination 'generic/platform=iOS' \
+  -derivedDataPath .xcodebuild/ios-sample \
+  CODE_SIGNING_ALLOWED=NO
+```
+
+The harness is used for native iOS performance and behavior checks before
+Flutter bridge validation.
+
+---
+
+## Repository Layout
+
+```text
+.
+|-- lib/                         # Public Dart API and method-channel contract
+|-- android/                     # Flutter Android plugin wrapper
+|   |-- src/                     # Android bridge code
+|   |-- compressor-core/         # Reusable Android Media3 engine
+|   |-- sample-app/              # Native Android validation harness
+|   `-- workspace/               # Standalone Gradle runner for native modules
+|-- ios/                         # Flutter iOS plugin wrapper + native core
+|   |-- Classes/                 # Native Swift compression core
+|   |-- Tests/                   # iOS native unit tests
+|   `-- SampleApp/               # Native iOS validation harness
+|-- example/                     # Public Flutter plugin example app
+|-- benchmarks/
+|   `-- video_compress_compare/  # Internal benchmark vs video_compress
+|-- test/                        # Dart unit/contract tests
+|-- pubspec.yaml                 # Flutter package metadata
+|-- vidsqueeze.podspec           # Flutter plugin podspec
+`-- README.md
+```
+
+Generated folders such as `.dart_tool/`, `build/`, `.gradle/`, `.kotlin/`,
+`.xcodebuild/`, `ios/Pods/`, and app-local build outputs are ignored.
+
+---
+
+## Examples And Benchmarks
+
+### Flutter Example
+
+```bash
+cd example
+flutter run
+```
+
+The Flutter example validates the public API: pick video, configure request,
+compress, stream progress, and inspect result.
+
+### Benchmark Harness
+
+```bash
+cd benchmarks/video_compress_compare
+flutter run -d <device-id>
+```
+
+The benchmark harness compares `vidsqueeze` against `video_compress` using the
+same selected input. It is not the public example app. It keeps competitor
+dependencies and benchmark UI outside `example/`.
+
+Default benchmark order:
+
+1. Run `video_compress`.
+2. Wait 10 seconds.
+3. Run `vidsqueeze`.
+4. Show comparison and per-engine raw result cards.
 
 ---
 
@@ -137,32 +250,53 @@ flutter analyze
 flutter test
 ```
 
-### Android
+### Flutter Example
+
+```bash
+cd example
+flutter analyze
+flutter test
+flutter build apk --debug
+```
+
+### Android Core
 
 ```bash
 ./android/workspace/gradlew -p android/workspace :compressor-core:testDebugUnitTest
 ./android/workspace/gradlew -p android/workspace :sample-app:assembleDebug
 ```
 
-### iOS
+### iOS Core
 
 ```bash
-cd ios && swift test --disable-sandbox
+cd ios
+swift test --disable-sandbox
 ```
 
-Standalone iOS native harness:
+### Benchmark App
 
 ```bash
-xcodebuild build -project ios/SampleApp/vidsqueeze-sample.xcodeproj -scheme vidsqueeze-sample -destination 'generic/platform=iOS' -derivedDataPath .xcodebuild/ios-sample CODE_SIGNING_ALLOWED=NO
+cd benchmarks/video_compress_compare
+flutter analyze
+flutter test
+flutter build apk --debug
 ```
 
 ---
 
 ## Current Limits
 
-- ❌ Thumbnail API
-- ❌ Background service/job orchestration
-- ❌ Direct `PHAsset` bridge input
-- ❌ Remote URL input
-- ❌ Caller-selected output container
+- Compression only; no thumbnail/media-info utility API.
+- Local file input only.
+- MP4 output only.
+- Single active compression task per plugin instance.
+- Direct Photos/`PHAsset` input is not part of v1.
+- Remote URL input is not part of v1.
+- Background service/job scheduling is caller-owned.
 
+---
+
+## Status
+
+Android and iOS native cores are present. Flutter bridge and examples are being
+hardened toward a pub.dev-ready v1 release.

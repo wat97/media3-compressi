@@ -1,0 +1,18 @@
+# Internal validation harnesses and repository-only docs.
+benchmarks/
+docs/
+android/sample-app/
+android/workspace/
+ios/SampleApp/
+ios/Tests/
+
+# Generated and local-only outputs.
+.dart_tool/
+.gradle/
+.kotlin/
+.xcodebuild/
+build/
+captures/
+ios/.build/
+ios/Pods/
+*.log

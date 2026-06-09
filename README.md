@@ -22,8 +22,8 @@ container yet.
 flutter pub add vidsqueeze
 ```
 
-Package is still under active preparation for public release. Until published,
-use a path or git dependency from consuming apps.
+Until the first pub.dev release is available, use a Git dependency from
+consuming apps.
 
 ---
 
@@ -108,8 +108,8 @@ Android implementation lives in two layers:
 
 - Flutter plugin wrapper: `android/`
 - Native engine module: `android/compressor-core/`
-- Native validation app: `android/sample-app/`
-- Standalone Gradle runner: `android/workspace/`
+- Native validation app: repository-only `android/sample-app/`
+- Standalone Gradle runner: repository-only `android/workspace/`
 
 ### Engine
 
@@ -148,7 +148,7 @@ iOS implementation lives in:
 
 - Flutter plugin wrapper: `ios/`
 - Native Swift core: `ios/Classes/`
-- Native sample harness: `ios/SampleApp/`
+- Native sample harness: repository-only `ios/SampleApp/`
 
 ### Engine
 
@@ -189,15 +189,15 @@ Flutter bridge validation.
 |-- android/                     # Flutter Android plugin wrapper
 |   |-- src/                     # Android bridge code
 |   |-- compressor-core/         # Reusable Android Media3 engine
-|   |-- sample-app/              # Native Android validation harness
-|   `-- workspace/               # Standalone Gradle runner for native modules
+|   |-- sample-app/              # Repository-only native Android harness
+|   `-- workspace/               # Repository-only Gradle runner
 |-- ios/                         # Flutter iOS plugin wrapper + native core
 |   |-- Classes/                 # Native Swift compression core
-|   |-- Tests/                   # iOS native unit tests
-|   `-- SampleApp/               # Native iOS validation harness
+|   |-- Tests/                   # Repository-only iOS native unit tests
+|   `-- SampleApp/               # Repository-only native iOS harness
 |-- example/                     # Public Flutter plugin example app
 |-- benchmarks/
-|   `-- video_compress_compare/  # Internal benchmark vs video_compress
+|   `-- video_compress_compare/  # Repository-only benchmark vs video_compress
 |-- test/                        # Dart unit/contract tests
 |-- pubspec.yaml                 # Flutter package metadata
 |-- vidsqueeze.podspec           # Flutter plugin podspec
@@ -205,32 +205,34 @@ Flutter bridge validation.
 ```
 
 Generated folders such as `.dart_tool/`, `build/`, `.gradle/`, `.kotlin/`,
-`.xcodebuild/`, `ios/Pods/`, and app-local build outputs are ignored.
+`.xcodebuild/`, `ios/Pods/`, and app-local build outputs are ignored. Internal
+validation harnesses and benchmarks are kept in the GitHub repository but
+excluded from the pub.dev package archive.
 
 ---
 
-## Examples And Benchmarks
-
-### Flutter Example
+## Example
 
 ```bash
 cd example
 flutter run
 ```
 
-The Flutter example validates the public API: pick video, configure request,
-compress, stream progress, and inspect result.
+The public Flutter example validates the package API: pick video, configure a
+request, compress, stream progress, and inspect the result.
 
-### Benchmark Harness
+## Repository-Only Harnesses
 
-```bash
-cd benchmarks/video_compress_compare
-flutter run -d <device-id>
-```
+The repository also contains validation harnesses that are intentionally
+excluded from the pub.dev archive:
+
+- [Native Android harness](https://github.com/wat97/media3-compressi/tree/main/android/sample-app)
+- [Native iOS harness](https://github.com/wat97/media3-compressi/tree/main/ios/SampleApp)
+- [Benchmark vs video_compress](https://github.com/wat97/media3-compressi/tree/main/benchmarks/video_compress_compare)
 
 The benchmark harness compares `vidsqueeze` against `video_compress` using the
-same selected input. It is not the public example app. It keeps competitor
-dependencies and benchmark UI outside `example/`.
+same selected input. It is not the public example app because it includes a
+competitor dependency and benchmark-specific UI.
 
 Default benchmark order:
 

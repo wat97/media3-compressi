@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "dev.enb.compressi.core"
+    namespace = "dev.wat.vidsqueeze.core"
     compileSdk = 36
 
     defaultConfig {

@@ -19,7 +19,7 @@ final class VidsqueezeVideoCompressor {
         fallbackPlanner: VidsqueezeFallbackPlanner = VidsqueezeFallbackPlanner(),
         outputValidator: VidsqueezeOutputValidator = VidsqueezeOutputValidator(),
         errorClassifier: VidsqueezeErrorClassifier = VidsqueezeErrorClassifier(),
-        workQueue: DispatchQueue = DispatchQueue(label: "dev.enb.vidsqueeze.ios.compressor", qos: .userInitiated)
+        workQueue: DispatchQueue = DispatchQueue(label: "dev.wat.vidsqueeze.ios.compressor", qos: .userInitiated)
     ) {
         self.sourceInspector = sourceInspector
         self.capabilityResolver = capabilityResolver
@@ -248,7 +248,7 @@ private final class VidsqueezeCompressionTask: VidsqueezeCompressionHandle, @unc
         schedulePump(
             readerOutput: videoOutput,
             writerInput: videoInput,
-            queue: DispatchQueue(label: "dev.enb.vidsqueeze.ios.video-pump"),
+            queue: DispatchQueue(label: "dev.wat.vidsqueeze.ios.video-pump"),
             group: group,
             sharedError: pumpError
         ) { [weak self] sampleBuffer in
@@ -265,7 +265,7 @@ private final class VidsqueezeCompressionTask: VidsqueezeCompressionHandle, @unc
             schedulePump(
                 readerOutput: audioOutput,
                 writerInput: audioInput,
-                queue: DispatchQueue(label: "dev.enb.vidsqueeze.ios.audio-pump"),
+                queue: DispatchQueue(label: "dev.wat.vidsqueeze.ios.audio-pump"),
                 group: group,
                 sharedError: pumpError,
                 onSample: nil

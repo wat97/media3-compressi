@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "dev.enb.compressi.sample"
+    namespace = "dev.wat.vidsqueeze.sample"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "dev.enb.compressi.sample"
+        applicationId = "dev.wat.vidsqueeze.sample"
         minSdk = 23
         targetSdk = 36
         versionCode = 1

@@ -23,7 +23,7 @@ flutter:
   plugin:
     platforms:
       android:
-        package: dev.enb.vidsqueeze
+        package: dev.wat.vidsqueeze
         pluginClass: VidsqueezePlugin
       ios:
         pluginClass: VidsqueezePlugin

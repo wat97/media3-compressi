@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "dev.enb.vidsqueeze_example"
+    namespace = "dev.wat.vidsqueeze_example"
     compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
@@ -19,7 +19,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "dev.enb.vidsqueeze_example"
+        applicationId = "dev.wat.vidsqueeze_example"
         minSdk = 23
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

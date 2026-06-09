@@ -1,4 +1,4 @@
-group 'dev.enb.vidsqueeze'
+group 'dev.wat.vidsqueeze'
 version '0.1.0-dev.1'
 
 buildscript {
@@ -36,7 +36,7 @@ def flutterSdkPath = {
 }()
 
 android {
-    namespace 'dev.enb.vidsqueeze'
+    namespace 'dev.wat.vidsqueeze'
     compileSdk 36
 
     defaultConfig {

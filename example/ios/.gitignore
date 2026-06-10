@@ -14,10 +14,6 @@ Icon?
 **/.symlinks/
 profile
 xcuserdata
-Podfile.lock
-Runner.xcodeproj/project.xcworkspace/xcshareddata/
-Runner.xcworkspace/xcshareddata/
-Runner.xcworkspace/xcshareddata/swiftpm/
 **/.generated/
 Flutter/App.framework
 Flutter/Flutter.framework

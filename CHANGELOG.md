@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.0-dev.3
+
+- Added Dartdoc comments for the public Dart API to improve pub.dev API
+  reference coverage.
+
 ## 0.1.0-dev.2
 
 - Clarified supported SDK and platform surface for pub.dev.

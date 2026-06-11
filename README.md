@@ -24,7 +24,7 @@ Or add it manually:
 
 ```yaml
 dependencies:
-  vidsqueeze: ^0.1.0-dev.2
+  vidsqueeze: ^0.1.0-dev.3
 ```
 
 Then install dependencies:

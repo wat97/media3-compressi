@@ -13,6 +13,7 @@ ios/Tests/
 .xcodebuild/
 build/
 captures/
+doc/
 ios/.build/
 ios/Pods/
 *.log

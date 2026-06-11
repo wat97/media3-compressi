@@ -41,27 +41,111 @@ because compression runs through platform channels and native encoder stacks.
 flutter pub add vidsqueeze
 ```
 
-Until the first pub.dev release is available, use a Git dependency from
-consuming apps.
+Or add it manually:
+
+```yaml
+dependencies:
+  vidsqueeze: ^0.1.0-dev.2
+```
+
+Then install dependencies:
+
+```bash
+flutter pub get
+```
+
+### Platform Setup
+
+#### Android
+
+`vidsqueeze` uses native Android encoders through Media3. Minimum supported
+Android API is 23.
+
+If your app reads videos from shared storage or a picker, handle permissions or
+use a file picker package in the app layer. The plugin expects a readable local
+input path and a writable output directory.
+
+#### iOS
+
+`vidsqueeze` uses AVFoundation and supports iOS 14+. If your app lets users
+pick videos from Photos, add the Photos permission text required by your picker
+flow in `ios/Runner/Info.plist`.
+
+For example:
+
+```xml
+<key>NSPhotoLibraryUsageDescription</key>
+<string>Select videos to compress.</string>
+```
 
 ---
 
-## Flutter Usage
+## Usage
 
-### Compress Video
+### 1. Import Package
 
 ```dart
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
+import 'package:vidsqueeze/vidsqueeze.dart';
+```
+
+### 2. Listen To Progress
+
+Subscribe before starting compression so the UI receives early states such as
+`preparing`.
+
+```dart
+late final StreamSubscription<CompressionState> subscription;
+
+subscription = Vidsqueeze.instance.states().listen((state) {
+  switch (state.phase) {
+    case CompressionPhase.preparing:
+      debugPrint('Preparing ${state.taskId}');
+    case CompressionPhase.transcoding:
+      debugPrint('Progress ${state.progressPercent ?? 0}%');
+    case CompressionPhase.finalizing:
+      debugPrint('Finalizing output');
+    case CompressionPhase.completed:
+      debugPrint('Completed ${state.taskId}');
+    case CompressionPhase.failed:
+      debugPrint('Failed ${state.code}: ${state.message}');
+    case CompressionPhase.cancelled:
+      debugPrint('Cancelled ${state.taskId}');
+  }
+});
+```
+
+Dispose the subscription with the screen or controller that owns the
+compression UI.
+
+```dart
+await subscription.cancel();
+```
+
+### 3. Compress A Local Video
+
+Use app-owned local paths. Picker packages commonly return either a local file
+path or a temporary copied file. Output directory must already exist and be
+writable by the app.
+
+```dart
+final taskId = DateTime.now().microsecondsSinceEpoch.toString();
+
 final request = CompressionRequest(
-  inputPath: 'file:///storage/emulated/0/Movies/input.mp4',
-  outputDirectoryPath: '/storage/emulated/0/Movies/Compressed',
-  outputFileName: 'compressed.mp4',
+  taskId: taskId,
+  inputPath: inputFile.path,
+  outputDirectoryPath: outputDirectory.path,
+  outputFileName: 'vidsqueeze_$taskId.mp4',
   preset: CompressionPreset.balanced,
   maxResolutionCap: 1080,
-  forceCodec: ForceCodec.auto,
-  maxBitrate: 3_000_000,
   allowHevc: true,
   keepAudio: true,
   keepOriginalIfLarger: true,
+  forceCodec: ForceCodec.auto,
+  maxBitrate: null,
   progressIntervalMs: 250,
 );
 
@@ -69,21 +153,93 @@ final result = await Vidsqueeze.instance.compress(request);
 
 print(result.outputPath);
 print(result.outputSizeBytes);
+print(result.usedOriginalSource);
 ```
 
-### Listen To Progress
+### 4. Choose A Preset
+
+| Preset | Best for |
+|---|---|
+| `CompressionPreset.quality` | Higher visual quality and less aggressive bitrate reduction |
+| `CompressionPreset.balanced` | Default user-facing compression |
+| `CompressionPreset.smallSize` | Smaller files when quality tradeoff is acceptable |
+
+`maxResolutionCap` is a height cap, not a forced resize. The engine never
+upscales. For example, `maxResolutionCap: 1080` keeps 720p input at 720p and
+caps 4K input to 1080p.
+
+### 5. Codec Control
+
+Use `ForceCodec.auto` for most apps. It lets the native engine choose a safe
+path and fallback when needed.
 
 ```dart
-final subscription = Vidsqueeze.instance.states().listen((state) {
-  print('${state.phase.value}: ${state.progressPercent ?? '-'}');
-});
+final request = CompressionRequest(
+  inputPath: inputFile.path,
+  outputDirectoryPath: outputDirectory.path,
+  forceCodec: ForceCodec.auto,
+  allowHevc: true,
+);
 ```
 
-### Cancel Active Task
+Use forced codecs only when your product has a strict compatibility target.
 
 ```dart
-await Vidsqueeze.instance.cancel();
+final avcOnly = CompressionRequest(
+  inputPath: inputFile.path,
+  outputDirectoryPath: outputDirectory.path,
+  forceCodec: ForceCodec.avc,
+  allowHevc: false,
+);
 ```
+
+### 6. Cancel Active Compression
+
+Pass the same `taskId` used in the request.
+
+```dart
+await Vidsqueeze.instance.cancel(taskId);
+```
+
+Cancellation is best-effort. Native work is stopped and a `cancelled` state is
+emitted when the platform pipeline confirms cancellation.
+
+### 7. Read Result Metadata
+
+```dart
+final savedBytes = result.sourceSizeBytes - result.outputSizeBytes;
+final savedPercent = result.sourceSizeBytes == 0
+    ? 0
+    : (savedBytes / result.sourceSizeBytes * 100).round();
+
+debugPrint('Output: ${result.outputPath}');
+debugPrint('Codec: ${result.codec.value}');
+debugPrint('Target height: ${result.targetHeight ?? 'original'}');
+debugPrint('Target bitrate: ${result.targetBitrate}');
+debugPrint('Attempts: ${result.attempts}');
+debugPrint('Saved: $savedPercent%');
+```
+
+When `keepOriginalIfLarger` is `true`, `usedOriginalSource` can be `true`. This
+means compression completed but the compressed output was larger than the
+source, so the engine returned the original path for better user outcome.
+
+### 8. Handle Errors
+
+`compress` can throw `PlatformException` for native failures and channel
+contract failures.
+
+```dart
+try {
+  final result = await Vidsqueeze.instance.compress(request);
+  // Use result.outputPath.
+} on PlatformException catch (error) {
+  debugPrint('vidsqueeze failed: ${error.code} ${error.message}');
+}
+```
+
+For user-facing UI, prefer listening to `states()` as well. Failed states carry
+native error `code` and `message` when available.
 
 ---
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.0-dev.2
+
+- Clarified supported SDK and platform surface for pub.dev.
+- Expanded README with production-style installation, usage, progress,
+  cancellation, preset, and platform setup guidance.
+- Marked generated Dart API documentation output as ignored.
+
 ## 0.1.0-dev.1
 
 - Initial `vidsqueeze` Flutter plugin scaffolding

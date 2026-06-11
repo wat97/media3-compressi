@@ -14,6 +14,25 @@ Current v1 scope is compression only. No thumbnail API, remote URL input,
 direct `PHAsset` input, background service orchestration, or caller-selected
 container yet.
 
+## Supported SDK And Platforms
+
+`vidsqueeze` is a Flutter plugin, not a pure Dart package. It requires Flutter
+because compression runs through platform channels and native encoder stacks.
+
+| SDK | Status |
+|---|---|
+| Flutter | Supported |
+| Dart-only | Not supported |
+
+| Platform | Status | Native engine |
+|---|---|---|
+| Android | Supported | Media3 Transformer |
+| iOS | Supported | AVFoundation |
+| Linux | Not supported | Planned separately |
+| macOS | Not supported | Planned separately |
+| Web | Not supported | Requires a different browser pipeline |
+| Windows | Not supported | Planned separately |
+
 ---
 
 ## Install

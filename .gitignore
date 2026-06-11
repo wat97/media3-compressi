@@ -16,6 +16,7 @@ pubspec.lock
 example/.dart_tool/
 example/.flutter-plugins
 example/.flutter-plugins-dependencies
+example/build
 example/.pub/
 android/.gradle/
 android/workspace/.gradle/

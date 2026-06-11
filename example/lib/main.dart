@@ -74,7 +74,7 @@ class _CompressionDemoScreenState extends State<CompressionDemoScreen> {
 
   CompressionPreset _preset = CompressionPreset.balanced;
   ForceCodec _forceCodec = ForceCodec.auto;
-  int? _maxResolutionCap = 1080;
+  CompressionResolutionCap _maxResolutionCap = CompressionResolutionCap.p1080;
   bool _allowHevc = true;
   bool _keepAudio = true;
   bool _keepOriginalIfLarger = true;
@@ -508,10 +508,10 @@ class _CompressionDemoScreenState extends State<CompressionDemoScreen> {
                         const Divider(height: 1, thickness: 1),
                         _SettingRow(
                           label: 'Max Resolution',
-                          child: _Dropdown<int?>(
+                          child: _Dropdown<CompressionResolutionCap>(
                             value: _maxResolutionCap,
-                            items: _resolutionCaps,
-                            label: _resolutionLabel,
+                            items: CompressionResolutionCap.values,
+                            label: (value) => value.label,
                             onChanged: (v) =>
                                 setState(() => _maxResolutionCap = v),
                           ),
@@ -1176,12 +1176,6 @@ class _ResultRow extends StatelessWidget {
 }
 
 // Utility Helpers
-
-const List<int?> _resolutionCaps = [null, 2160, 1440, 1080, 720, 540, 480];
-
-String _resolutionLabel(int? value) {
-  return value == null ? 'Original' : '${value}p';
-}
 
 int? _parseOptionalInt(String value) {
   final trimmed = value.trim();

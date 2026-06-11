@@ -82,7 +82,7 @@ class BenchmarkResolution {
   });
 
   final String label;
-  final int? vidsqueezeCap;
+  final CompressionResolutionCap vidsqueezeCap;
   final video_compress.VideoQuality videoCompressQuality;
 }
 
@@ -163,27 +163,27 @@ const _scenarios = <BenchmarkScenario>[
 const _resolutions = <BenchmarkResolution>[
   BenchmarkResolution(
     label: 'Original',
-    vidsqueezeCap: null,
+    vidsqueezeCap: CompressionResolutionCap.original,
     videoCompressQuality: video_compress.VideoQuality.HighestQuality,
   ),
   BenchmarkResolution(
     label: '1080p',
-    vidsqueezeCap: 1080,
+    vidsqueezeCap: CompressionResolutionCap.p1080,
     videoCompressQuality: video_compress.VideoQuality.Res1920x1080Quality,
   ),
   BenchmarkResolution(
     label: '720p',
-    vidsqueezeCap: 720,
+    vidsqueezeCap: CompressionResolutionCap.p720,
     videoCompressQuality: video_compress.VideoQuality.Res1280x720Quality,
   ),
   BenchmarkResolution(
     label: '540p',
-    vidsqueezeCap: 540,
+    vidsqueezeCap: CompressionResolutionCap.p540,
     videoCompressQuality: video_compress.VideoQuality.Res960x540Quality,
   ),
   BenchmarkResolution(
     label: '480p',
-    vidsqueezeCap: 480,
+    vidsqueezeCap: CompressionResolutionCap.p480,
     videoCompressQuality: video_compress.VideoQuality.Res640x480Quality,
   ),
 ];
@@ -1347,9 +1347,7 @@ String _vidsqueezeScenarioLabel(
   BenchmarkScenario scenario,
   BenchmarkResolution resolution,
 ) {
-  final height = resolution.vidsqueezeCap == null
-      ? 'original'
-      : '${resolution.vidsqueezeCap}p';
+  final height = resolution.vidsqueezeCap.label.toLowerCase();
   return '${scenario.vidsqueezePreset.value}, $height, audio ${scenario.includeAudio ? 'on' : 'off'}';
 }
 

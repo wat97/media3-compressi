@@ -30,14 +30,23 @@ class CompressionResult {
     return CompressionResult(
       taskId: map[VidsqueezeChannelContract.taskId] as String? ?? '',
       outputPath: map[VidsqueezeChannelContract.outputPath] as String? ?? '',
-      outputSizeBytes: (map[VidsqueezeChannelContract.outputSizeBytes] as num?)?.toInt() ?? 0,
-      sourceSizeBytes: (map[VidsqueezeChannelContract.sourceSizeBytes] as num?)?.toInt() ?? 0,
-      durationMs: (map[VidsqueezeChannelContract.durationMs] as num?)?.toInt() ?? 0,
-      codec: ForceCodec.fromValue(map[VidsqueezeChannelContract.codec] as String? ?? 'auto'),
-      targetHeight: (map[VidsqueezeChannelContract.targetHeight] as num?)?.toInt(),
-      targetBitrate: (map[VidsqueezeChannelContract.targetBitrate] as num?)?.toInt() ?? 0,
+      outputSizeBytes:
+          (map[VidsqueezeChannelContract.outputSizeBytes] as num?)?.toInt() ??
+              0,
+      sourceSizeBytes:
+          (map[VidsqueezeChannelContract.sourceSizeBytes] as num?)?.toInt() ??
+              0,
+      durationMs:
+          (map[VidsqueezeChannelContract.durationMs] as num?)?.toInt() ?? 0,
+      codec: ForceCodec.fromValue(
+          map[VidsqueezeChannelContract.codec] as String? ?? 'auto'),
+      targetHeight:
+          (map[VidsqueezeChannelContract.targetHeight] as num?)?.toInt(),
+      targetBitrate:
+          (map[VidsqueezeChannelContract.targetBitrate] as num?)?.toInt() ?? 0,
       attempts: (map[VidsqueezeChannelContract.attempts] as num?)?.toInt() ?? 0,
-      usedOriginalSource: map[VidsqueezeChannelContract.usedOriginalSource] as bool? ?? false,
+      usedOriginalSource:
+          map[VidsqueezeChannelContract.usedOriginalSource] as bool? ?? false,
     );
   }
 

@@ -12,8 +12,10 @@ class Vidsqueeze {
 
   static final Vidsqueeze instance = Vidsqueeze._();
 
-  static const MethodChannel _methodChannel = MethodChannel(VidsqueezeChannelContract.methodsChannel);
-  static const EventChannel _eventChannel = EventChannel(VidsqueezeChannelContract.eventsChannel);
+  static const MethodChannel _methodChannel =
+      MethodChannel(VidsqueezeChannelContract.methodsChannel);
+  static const EventChannel _eventChannel =
+      EventChannel(VidsqueezeChannelContract.eventsChannel);
 
   Stream<CompressionState>? _stateStream;
 

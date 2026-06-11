@@ -6,13 +6,15 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   const methodChannel = MethodChannel('vidsqueeze/methods');
-  final messenger = TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+  final messenger =
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
 
   tearDown(() async {
     messenger.setMockMethodCallHandler(methodChannel, null);
   });
 
-  test('compress sends request over method channel and parses result', () async {
+  test('compress sends request over method channel and parses result',
+      () async {
     late MethodCall capturedCall;
     messenger.setMockMethodCallHandler(methodChannel, (call) async {
       capturedCall = call;
@@ -37,7 +39,7 @@ void main() {
         outputDirectoryPath: '/tmp',
         outputFileName: 'output.mp4',
         preset: CompressionPreset.smallSize,
-        maxResolutionCap: 720,
+        maxResolutionCap: CompressionResolutionCap.p720,
         allowHevc: false,
         keepAudio: false,
         keepOriginalIfLarger: false,

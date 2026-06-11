@@ -14,27 +14,6 @@ Current v1 scope is compression only. No thumbnail API, remote URL input,
 direct `PHAsset` input, background service orchestration, or caller-selected
 container yet.
 
-## Supported SDK And Platforms
-
-`vidsqueeze` is a Flutter plugin, not a pure Dart package. It requires Flutter
-because compression runs through platform channels and native encoder stacks.
-
-| SDK | Status |
-|---|---|
-| Flutter | Supported |
-| Dart-only | Not supported |
-
-| Platform | Status | Native engine |
-|---|---|---|
-| Android | Supported | Media3 Transformer |
-| iOS | Supported | AVFoundation |
-| Linux | Not supported | Planned separately |
-| macOS | Not supported | Planned separately |
-| Web | Not supported | Requires a different browser pipeline |
-| Windows | Not supported | Planned separately |
-
----
-
 ## Install
 
 ```bash
@@ -140,7 +119,7 @@ final request = CompressionRequest(
   outputDirectoryPath: outputDirectory.path,
   outputFileName: 'vidsqueeze_$taskId.mp4',
   preset: CompressionPreset.balanced,
-  maxResolutionCap: 1080,
+  maxResolutionCap: CompressionResolutionCap.p1080,
   allowHevc: true,
   keepAudio: true,
   keepOriginalIfLarger: true,
@@ -165,8 +144,9 @@ print(result.usedOriginalSource);
 | `CompressionPreset.smallSize` | Smaller files when quality tradeoff is acceptable |
 
 `maxResolutionCap` is a height cap, not a forced resize. The engine never
-upscales. For example, `maxResolutionCap: 1080` keeps 720p input at 720p and
-caps 4K input to 1080p.
+upscales. For example, `CompressionResolutionCap.p1080` keeps 720p input at
+720p and caps 4K input to 1080p. Use `CompressionResolutionCap.original` to keep
+the source resolution.
 
 ### 5. Codec Control
 
@@ -252,6 +232,7 @@ native error `code` and `message` when available.
 | `CompressionResult` | Output path, size, codec, duration, attempts |
 | `CompressionState` | Phase and progress event |
 | `CompressionPreset` | `balanced`, `quality`, `smallSize` |
+| `CompressionResolutionCap` | `original`, `p2160`, `p1440`, `p1080`, `p720`, `p540`, `p480` |
 | `ForceCodec` | `auto`, `avc`, `hevc` |
 
 ### Request Fields
@@ -263,7 +244,7 @@ native error `code` and `message` when available.
 | `outputDirectoryPath` | `String` | required | Existing/writable output directory |
 | `outputFileName` | `String?` | generated | Must be non-empty when provided |
 | `preset` | `CompressionPreset` | `balanced` | Quality/size policy |
-| `maxResolutionCap` | `int?` | `null` | Target max height, never upscales |
+| `maxResolutionCap` | `CompressionResolutionCap` | `p1080` | Target max height enum, never upscales |
 | `forceCodec` | `ForceCodec` | `auto` | Force AVC/HEVC or use platform policy |
 | `maxBitrate` | `int?` | `null` | Bits per second cap |
 | `allowHevc` | `bool` | `true` | Allows HEVC when safe and supported |

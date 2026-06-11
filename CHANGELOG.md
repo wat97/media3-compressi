@@ -5,6 +5,7 @@
 - Clarified supported SDK and platform surface for pub.dev.
 - Expanded README with production-style installation, usage, progress,
   cancellation, preset, and platform setup guidance.
+- Added `CompressionResolutionCap` enum for resolution-cap selection.
 - Marked generated Dart API documentation output as ignored.
 
 ## 0.1.0-dev.1

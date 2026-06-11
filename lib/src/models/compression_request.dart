@@ -1,4 +1,5 @@
 import 'compression_preset.dart';
+import 'compression_resolution_cap.dart';
 import 'force_codec.dart';
 import '../platform/channel_contract.dart';
 
@@ -8,7 +9,7 @@ class CompressionRequest {
     required this.outputDirectoryPath,
     this.outputFileName,
     this.preset = CompressionPreset.balanced,
-    this.maxResolutionCap,
+    this.maxResolutionCap = CompressionResolutionCap.p1080,
     this.allowHevc = true,
     this.keepAudio = true,
     this.keepOriginalIfLarger = true,
@@ -16,17 +17,17 @@ class CompressionRequest {
     this.maxBitrate,
     this.progressIntervalMs = 250,
     this.taskId,
-  }) : assert(inputPath != ''),
-       assert(outputDirectoryPath != ''),
-       assert(outputFileName == null || outputFileName != ''),
-       assert(maxBitrate == null || maxBitrate > 0),
-       assert(progressIntervalMs > 0);
+  })  : assert(inputPath != ''),
+        assert(outputDirectoryPath != ''),
+        assert(outputFileName == null || outputFileName != ''),
+        assert(maxBitrate == null || maxBitrate > 0),
+        assert(progressIntervalMs > 0);
 
   final String inputPath;
   final String outputDirectoryPath;
   final String? outputFileName;
   final CompressionPreset preset;
-  final int? maxResolutionCap;
+  final CompressionResolutionCap maxResolutionCap;
   final bool allowHevc;
   final bool keepAudio;
   final bool keepOriginalIfLarger;
@@ -42,7 +43,7 @@ class CompressionRequest {
       VidsqueezeChannelContract.outputDirectoryPath: outputDirectoryPath,
       VidsqueezeChannelContract.outputFileName: outputFileName,
       VidsqueezeChannelContract.preset: preset.value,
-      VidsqueezeChannelContract.maxResolutionCap: maxResolutionCap,
+      VidsqueezeChannelContract.maxResolutionCap: maxResolutionCap.height,
       VidsqueezeChannelContract.allowHevc: allowHevc,
       VidsqueezeChannelContract.keepAudio: keepAudio,
       VidsqueezeChannelContract.keepOriginalIfLarger: keepOriginalIfLarger,

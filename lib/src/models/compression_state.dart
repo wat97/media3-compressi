@@ -39,9 +39,11 @@ class CompressionState {
     return CompressionState(
       taskId: map[VidsqueezeChannelContract.taskId] as String? ?? '',
       phase: CompressionPhase.fromValue(
-        map[VidsqueezeChannelContract.phase] as String? ?? VidsqueezeChannelContract.phaseFailed,
+        map[VidsqueezeChannelContract.phase] as String? ??
+            VidsqueezeChannelContract.phaseFailed,
       ),
-      progressPercent: (map[VidsqueezeChannelContract.progressPercent] as num?)?.toInt(),
+      progressPercent:
+          (map[VidsqueezeChannelContract.progressPercent] as num?)?.toInt(),
       code: map[VidsqueezeChannelContract.code] as String?,
       message: map[VidsqueezeChannelContract.message] as String?,
     );

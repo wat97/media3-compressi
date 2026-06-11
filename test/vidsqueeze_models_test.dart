@@ -8,6 +8,7 @@ void main() {
       outputDirectoryPath: '/tmp/output',
       preset: CompressionPreset.quality,
       forceCodec: ForceCodec.hevc,
+      maxResolutionCap: CompressionResolutionCap.p720,
       maxBitrate: 3000000,
       progressIntervalMs: 200,
     );
@@ -19,8 +20,20 @@ void main() {
     expect(map['outputDirectoryPath'], '/tmp/output');
     expect(map['preset'], 'quality');
     expect(map['forceCodec'], 'hevc');
+    expect(map['maxResolutionCap'], 720);
     expect(map['maxBitrate'], 3000000);
     expect(map['progressIntervalMs'], 200);
+  });
+
+  test('resolution cap maps to native height values', () {
+    expect(CompressionResolutionCap.original.height, isNull);
+    expect(CompressionResolutionCap.p1080.height, 1080);
+    expect(CompressionResolutionCap.fromHeight(null),
+        CompressionResolutionCap.original);
+    expect(CompressionResolutionCap.fromHeight(480),
+        CompressionResolutionCap.p480);
+    expect(CompressionResolutionCap.fromHeight(999),
+        CompressionResolutionCap.p1080);
   });
 
   test('compression request asserts invalid values', () {

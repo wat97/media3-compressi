@@ -1,3 +1,7 @@
+/// Flutter video compression plugin powered by native Android and iOS encoders.
+///
+/// Use [Vidsqueeze.instance] to start compression, listen to progress states,
+/// and cancel active work by task id.
 library vidsqueeze;
 
 export 'src/models/compression_request.dart';

@@ -33,7 +33,7 @@ void main() {
     });
 
     final result = await Vidsqueeze.instance.compress(
-      const CompressionRequest(
+      CompressionRequest(
         taskId: 'task-42',
         inputPath: 'file:///tmp/input.mp4',
         outputDirectoryPath: '/tmp',

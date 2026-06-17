@@ -58,6 +58,7 @@ class VideoCompressor private constructor(
                 require(request.outputDirectory.exists() || request.outputDirectory.mkdirs()) {
                     "Output directory does not exist and could not be created"
                 }
+                val outputDirectory = request.outputDirectory.canonicalFile
 
                 val source = sourceInspector.inspect(request.inputUri)
                 val capability = capabilityResolver.resolve()
@@ -66,7 +67,10 @@ class VideoCompressor private constructor(
                 var lastFailure: Throwable? = null
                 attempts.forEachIndexed { index, plan ->
                     ensureNotCancelled(cancelled)
-                    val tempFile = File(plan.outputDirectory, "${plan.outputFileName.removeSuffix(".mp4")}.tmp.mp4")
+                    val tempFile = safeChildFile(
+                        outputDirectory,
+                        "${plan.outputFileName.removeSuffix(".mp4")}.tmp.mp4",
+                    )
                     tempFile.delete()
 
                     try {
@@ -84,7 +88,7 @@ class VideoCompressor private constructor(
                         outputValidator.validate(tempFile, source)
 
                         val useOriginalSource = shouldKeepOriginalSource(request, source, tempFile)
-                        val outputFile = File(plan.outputDirectory, plan.outputFileName)
+                        val outputFile = safeChildFile(outputDirectory, plan.outputFileName)
                         if (outputFile.exists()) {
                             outputFile.delete()
                         }
@@ -155,6 +159,14 @@ class VideoCompressor private constructor(
 
     fun shutdown() {
         scope.cancel()
+    }
+
+    private fun safeChildFile(directory: File, fileName: String): File {
+        val outputFile = File(directory, fileName).canonicalFile
+        require(outputFile.parentFile == directory) {
+            "Output file must stay inside output directory"
+        }
+        return outputFile
     }
 
     private fun ensureNotCancelled(cancelled: AtomicBoolean) {

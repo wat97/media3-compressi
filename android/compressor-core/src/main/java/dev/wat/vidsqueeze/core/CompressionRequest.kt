@@ -17,7 +17,9 @@ data class CompressionRequest(
     val progressIntervalMs: Long = 250L,
 ) {
     init {
-        require(outputFileName.endsWith(".mp4")) { "Output file name must end with .mp4" }
+        require(isSafeOutputFileName(outputFileName)) {
+            "Output file name must be a plain .mp4 file name"
+        }
         require(maxBitrate == null || maxBitrate > 0) { "maxBitrate must be > 0 when provided" }
         require(progressIntervalMs > 0) { "progressIntervalMs must be > 0" }
     }
@@ -54,6 +56,18 @@ data class CompressionRequest(
     }
 
     companion object {
+        @JvmStatic
+        fun isSafeOutputFileName(fileName: String): Boolean {
+            return fileName.isNotBlank() &&
+                fileName != "." &&
+                fileName != ".." &&
+                !fileName.contains('/') &&
+                !fileName.contains('\\') &&
+                !fileName.contains("..") &&
+                !File(fileName).isAbsolute &&
+                fileName.lowercase().endsWith(".mp4")
+        }
+
         @JvmStatic
         fun builder(inputUri: Uri, outputDirectory: File): Builder {
             return Builder(inputUri, outputDirectory)

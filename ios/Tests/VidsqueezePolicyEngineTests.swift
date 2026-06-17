@@ -117,6 +117,27 @@ final class VidsqueezeRequestAndValidationTests: XCTestCase {
         )
     }
 
+
+
+    func testRejectsUnsafeOutputFileNames() {
+        let unsafeNames = [
+            "",
+            "../escape.mp4",
+            "nested/escape.mp4",
+            "nested\\escape.mp4",
+            "/tmp/escape.mp4",
+            "escape.mov",
+        ]
+
+        for fileName in unsafeNames {
+            XCTAssertFalse(
+                VidsqueezeCompressionRequest.isSafeOutputFileName(fileName),
+                fileName
+            )
+        }
+        XCTAssertTrue(VidsqueezeCompressionRequest.isSafeOutputFileName("safe.mp4"))
+    }
+
     func testValidatorRejectsEmptyOutput() throws {
         let tempDirectory = URL(fileURLWithPath: NSTemporaryDirectory())
             .appendingPathComponent(UUID().uuidString, isDirectory: true)

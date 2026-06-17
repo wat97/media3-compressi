@@ -3,7 +3,7 @@ import 'package:vidsqueeze/vidsqueeze.dart';
 
 void main() {
   test('compression request serializes expected values', () {
-    const request = CompressionRequest(
+    final request = CompressionRequest(
       inputPath: 'content://video/test',
       outputDirectoryPath: '/tmp/output',
       preset: CompressionPreset.quality,
@@ -36,13 +36,13 @@ void main() {
         CompressionResolutionCap.p1080);
   });
 
-  test('compression request asserts invalid values', () {
+  test('compression request validates invalid values at runtime', () {
     expect(
       () => CompressionRequest(
         inputPath: '',
         outputDirectoryPath: '/tmp/output',
       ),
-      throwsAssertionError,
+      throwsA(isA<ArgumentError>()),
     );
 
     expect(
@@ -51,7 +51,7 @@ void main() {
         outputDirectoryPath: '/tmp/output',
         progressIntervalMs: 0,
       ),
-      throwsAssertionError,
+      throwsA(isA<ArgumentError>()),
     );
 
     expect(
@@ -60,8 +60,27 @@ void main() {
         outputDirectoryPath: '/tmp/output',
         maxBitrate: 0,
       ),
-      throwsAssertionError,
+      throwsA(isA<ArgumentError>()),
     );
+
+    for (final fileName in <String>[
+      '',
+      '../escape.mp4',
+      'nested/escape.mp4',
+      r'nested\escape.mp4',
+      '/tmp/escape.mp4',
+      'escape.mov',
+    ]) {
+      expect(
+        () => CompressionRequest(
+          inputPath: 'file:///tmp/input.mp4',
+          outputDirectoryPath: '/tmp/output',
+          outputFileName: fileName,
+        ),
+        throwsA(isA<ArgumentError>()),
+        reason: fileName,
+      );
+    }
   });
 
   test('compression state deserializes expected values', () {

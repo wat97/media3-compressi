@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.1.0-dev.4
+
+- Hardened `outputFileName` validation across Dart, Android, and iOS so callers
+  can only pass plain `.mp4` file names, not path segments or traversal values.
+- Added native output path containment checks before promoting compressed output.
+- Fixed Android plugin cancellation lifecycle so a new compression task cannot
+  start until the previous native task reaches a terminal callback.
+- Replaced assert-only Dart request validation with runtime `ArgumentError`
+  checks that remain active in release builds.
+- Added regression tests for unsafe output file names and request validation.
+
 ## 0.1.0-dev.3
 
 - Added Dartdoc comments for the public Dart API to improve pub.dev API

@@ -69,7 +69,7 @@ class VidsqueezePlugin : FlutterPlugin, MethodChannel.MethodCallHandler, EventCh
     }
 
     private fun compress(call: MethodCall, result: MethodChannel.Result) {
-        if (activeHandle != null) {
+        if (activeTaskId.get() != null) {
             result.error(
                 FlutterContract.ERROR_BUSY,
                 "Another compression task is already running",
@@ -126,14 +126,12 @@ class VidsqueezePlugin : FlutterPlugin, MethodChannel.MethodCallHandler, EventCh
                 }
 
                 override fun onSuccess(resultValue: CompressionSuccess) {
-                    activeHandle = null
-                    activeTaskId.set(null)
+                    clearActiveTask(taskId)
                     result.success(resultValue.toMap(taskId))
                 }
 
                 override fun onFailure(failure: CompressionFailure) {
-                    activeHandle = null
-                    activeTaskId.set(null)
+                    clearActiveTask(taskId)
                     result.error(
                         failure.code.name.lowercase(),
                         failure.message,
@@ -148,10 +146,14 @@ class VidsqueezePlugin : FlutterPlugin, MethodChannel.MethodCallHandler, EventCh
         val taskId = (call.arguments as? Map<*, *>)?.stringOrNull(FlutterContract.KEY_TASK_ID)
         if (taskId == null || taskId == activeTaskId.get()) {
             activeHandle?.cancel()
-            activeHandle = null
-            activeTaskId.set(null)
         }
         result.success(null)
+    }
+
+    private fun clearActiveTask(taskId: String) {
+        if (activeTaskId.compareAndSet(taskId, null)) {
+            activeHandle = null
+        }
     }
 }
 

@@ -1,6 +1,6 @@
 name: vidsqueeze
 description: Native video compression for Flutter using Android Media3 and iOS AVFoundation, with progress streams, codec fallback, and MP4 output.
-version: 0.1.0-dev.3
+version: 0.1.0-dev.4
 homepage: https://github.com/wat97/media3-compressi
 repository: https://github.com/wat97/media3-compressi
 issue_tracker: https://github.com/wat97/media3-compressi/issues

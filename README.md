@@ -24,7 +24,7 @@ Or add it manually:
 
 ```yaml
 dependencies:
-  vidsqueeze: ^0.1.0-dev.3
+  vidsqueeze: ^0.1.0-dev.4
 ```
 
 Then install dependencies:
@@ -182,7 +182,9 @@ await Vidsqueeze.instance.cancel(taskId);
 ```
 
 Cancellation is best-effort. Native work is stopped and a `cancelled` state is
-emitted when the platform pipeline confirms cancellation.
+emitted when the platform pipeline confirms cancellation. On Android, the
+plugin keeps the task marked active until that terminal callback arrives so a
+new compression task cannot overlap with a still-shutting-down native export.
 
 ### 7. Read Result Metadata
 
@@ -242,7 +244,7 @@ native error `code` and `message` when available.
 | `taskId` | `String?` | generated | Optional caller-visible task id |
 | `inputPath` | `String` | required | Local file URI/path depending on platform bridge |
 | `outputDirectoryPath` | `String` | required | Existing/writable output directory |
-| `outputFileName` | `String?` | generated | Must be non-empty when provided |
+| `outputFileName` | `String?` | generated | Optional plain `.mp4` file name only; paths and traversal are rejected |
 | `preset` | `CompressionPreset` | `balanced` | Quality/size policy |
 | `maxResolutionCap` | `CompressionResolutionCap` | `p1080` | Target max height enum, never upscales |
 | `forceCodec` | `ForceCodec` | `auto` | Force AVC/HEVC or use platform policy |
@@ -252,9 +254,12 @@ native error `code` and `message` when available.
 | `keepOriginalIfLarger` | `bool` | `true` | Return original if compressed file is larger |
 | `progressIntervalMs` | `int` | `250` | Native progress throttle interval |
 
-Validation is intentionally strict: required strings must be non-empty,
-`maxBitrate` must be greater than zero when set, and `progressIntervalMs` must
-be greater than zero.
+Validation is intentionally strict and runs in release builds: required
+strings must be non-empty, `outputFileName` must be a plain `.mp4` file name
+when provided, `maxBitrate` must be greater than zero when set, and
+`progressIntervalMs` must be greater than zero. Do not pass absolute paths,
+subdirectories, `..`, or platform separators in `outputFileName`; use
+`outputDirectoryPath` for the destination directory.
 
 ---
 
@@ -456,5 +461,7 @@ flutter build apk --debug
 
 ## Status
 
-Android and iOS native cores are present. Flutter bridge and examples are being
-hardened toward a pub.dev-ready v1 release.
+`0.1.0-dev.4` hardens request validation, output path containment, and
+Android cancellation lifecycle. Android and iOS native cores are present; the
+Flutter bridge and examples are being iterated toward a pub.dev-ready v1
+release.

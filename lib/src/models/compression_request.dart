@@ -12,7 +12,7 @@ class CompressionRequest {
   ///
   /// [inputPath] must point to a readable local video file or platform-supported
   /// URI. [outputDirectoryPath] must be writable by the app.
-  const CompressionRequest({
+  CompressionRequest({
     required this.inputPath,
     required this.outputDirectoryPath,
     this.outputFileName,
@@ -25,11 +25,33 @@ class CompressionRequest {
     this.maxBitrate,
     this.progressIntervalMs = 250,
     this.taskId,
-  })  : assert(inputPath != ''),
-        assert(outputDirectoryPath != ''),
-        assert(outputFileName == null || outputFileName != ''),
-        assert(maxBitrate == null || maxBitrate > 0),
-        assert(progressIntervalMs > 0);
+  }) {
+    if (inputPath.trim().isEmpty) {
+      throw ArgumentError.value(inputPath, 'inputPath', 'must not be empty');
+    }
+    if (outputDirectoryPath.trim().isEmpty) {
+      throw ArgumentError.value(
+        outputDirectoryPath,
+        'outputDirectoryPath',
+        'must not be empty',
+      );
+    }
+    _validateOutputFileName(outputFileName);
+    if (maxBitrate != null && maxBitrate! <= 0) {
+      throw ArgumentError.value(
+        maxBitrate,
+        'maxBitrate',
+        'must be greater than zero',
+      );
+    }
+    if (progressIntervalMs <= 0) {
+      throw ArgumentError.value(
+        progressIntervalMs,
+        'progressIntervalMs',
+        'must be greater than zero',
+      );
+    }
+  }
 
   /// Local input video path or URI.
   final String inputPath;
@@ -83,5 +105,40 @@ class CompressionRequest {
       VidsqueezeChannelContract.maxBitrate: maxBitrate,
       VidsqueezeChannelContract.progressIntervalMs: progressIntervalMs,
     };
+  }
+
+  static void _validateOutputFileName(String? outputFileName) {
+    if (outputFileName == null) return;
+    if (outputFileName.trim().isEmpty) {
+      throw ArgumentError.value(
+        outputFileName,
+        'outputFileName',
+        'must not be empty',
+      );
+    }
+    if (outputFileName == '.' || outputFileName == '..') {
+      throw ArgumentError.value(
+        outputFileName,
+        'outputFileName',
+        'must be a file name, not a path segment',
+      );
+    }
+    if (outputFileName.contains('/') ||
+        outputFileName.contains(r'\') ||
+        outputFileName.contains('..') ||
+        outputFileName.contains(':')) {
+      throw ArgumentError.value(
+        outputFileName,
+        'outputFileName',
+        'must be a plain file name without path traversal',
+      );
+    }
+    if (!outputFileName.toLowerCase().endsWith('.mp4')) {
+      throw ArgumentError.value(
+        outputFileName,
+        'outputFileName',
+        'must end with .mp4',
+      );
+    }
   }
 }

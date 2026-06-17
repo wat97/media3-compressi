@@ -173,10 +173,26 @@ private extension Dictionary where Key == String, Value == Any {
 
         let outputFileName = stringValue(for: FlutterContract.keyOutputFileName)?.nonEmpty
             ?? "compressed_\(taskId).mp4"
+        guard VidsqueezeCompressionRequest.isSafeOutputFileName(outputFileName) else {
+            throw VidsqueezeCompressionFailure(
+                code: .unsupportedInput,
+                message: "Output file name must be a plain .mp4 file name"
+            )
+        }
+
         let inputURL = inputPath.toPlatformURL()
-        let outputURL = outputDirectoryPath
+        let outputDirectoryURL = outputDirectoryPath
             .toPlatformURL(isDirectory: true)
-            .appendingPathComponent(outputFileName)
+            .standardizedFileURL
+        let outputURL = outputDirectoryURL
+            .appendingPathComponent(outputFileName, isDirectory: false)
+            .standardizedFileURL
+        guard outputURL.deletingLastPathComponent().standardizedFileURL == outputDirectoryURL else {
+            throw VidsqueezeCompressionFailure(
+                code: .unsupportedInput,
+                message: "Output file must stay inside output directory"
+            )
+        }
 
         return try VidsqueezeCompressionRequest(
             inputURL: inputURL,

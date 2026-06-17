@@ -4,7 +4,7 @@
 
 - Prepare repo for Flutter plugin release shape.
 - Keep Android native core as current stable implementation detail.
-- Prepare iOS-native parity scaffolding for future core implementation.
+- Maintain iOS-native parity with the Android core through AVFoundation.
 - Bias toward zero-corruption output and stable fallback before aggressive size reduction.
 
 ## Modules
@@ -17,8 +17,8 @@
   - Native Android compression engine
   - Policy engine, capability probing, Media3 orchestration, validation, and error mapping
 - `ios`
-  - Native iOS parity scaffolding
-  - Request, preset, policy, and fallback model preparation for `iOS 14+`
+  - Native iOS compression core
+  - AVFoundation reader/writer pipeline, request validation, policy, fallback, and output validation for `iOS 14+`
 - `sample-app`
   - Internal Android verification harness
 - `example`
@@ -43,4 +43,7 @@
 - Let Media3 encoder fallback stay enabled for safe device-driven fallback.
 - Retry once in app policy when preferred codec path fails.
 - Validate output before promoting temp file to final destination.
+- Reject unsafe output file names at Dart and native boundaries.
+- Canonicalize/standardize native output paths and ensure they stay inside the requested output directory.
+- Keep Android plugin tasks active until success/failure/cancel callback to avoid overlapping transcodes after cancellation.
 - Return domain-level error codes to keep Flutter bridge thin.

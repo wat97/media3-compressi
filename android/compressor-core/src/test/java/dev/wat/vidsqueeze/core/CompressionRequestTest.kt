@@ -49,4 +49,29 @@ class CompressionRequestTest {
         assertThat(request.preset).isEqualTo(CompressionPreset.QUALITY)
         assertThat(request.maxResolutionCap).isNull()
     }
+
+    @Test
+    fun `rejects unsafe output file names`() {
+        val unsafeNames = listOf(
+            "",
+            "../escape.mp4",
+            "nested/escape.mp4",
+            "nested\\escape.mp4",
+            "/tmp/escape.mp4",
+            "escape.mov",
+        )
+
+        unsafeNames.forEach { outputFileName ->
+            runCatching {
+                CompressionRequest(
+                    inputUri = mock(Uri::class.java),
+                    outputDirectory = File("build/tmp"),
+                    outputFileName = outputFileName,
+                )
+            }.also { result ->
+                assertThat(result.isFailure).isTrue()
+            }
+        }
+    }
+
 }

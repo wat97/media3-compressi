@@ -118,10 +118,10 @@ struct VidsqueezeCompressionRequest {
         maxBitrate: Int? = nil,
         progressIntervalMs: Int = 250
     ) throws {
-        guard outputURL.pathExtension.lowercased() == "mp4" else {
+        guard Self.isSafeOutputFileName(outputURL.lastPathComponent) else {
             throw VidsqueezeCompressionFailure(
                 code: .unsupportedInput,
-                message: "Output file name must end with .mp4"
+                message: "Output file name must be a plain .mp4 file name"
             )
         }
         if let maxBitrate, maxBitrate <= 0 {
@@ -147,6 +147,17 @@ struct VidsqueezeCompressionRequest {
         self.forceCodec = forceCodec
         self.maxBitrate = maxBitrate
         self.progressIntervalMs = progressIntervalMs
+    }
+
+    static func isSafeOutputFileName(_ fileName: String) -> Bool {
+        !fileName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            && fileName != "."
+            && fileName != ".."
+            && !fileName.contains("/")
+            && !fileName.contains("\\")
+            && !fileName.contains("..")
+            && !fileName.contains(":")
+            && fileName.lowercased().hasSuffix(".mp4")
     }
 }
 

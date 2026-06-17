@@ -24,7 +24,7 @@ Or add it manually:
 
 ```yaml
 dependencies:
-  vidsqueeze: ^0.1.0-dev.4
+  vidsqueeze: ^0.1.0-dev.5
 ```
 
 Then install dependencies:
@@ -269,6 +269,7 @@ Android implementation lives in two layers:
 
 - Flutter plugin wrapper: `android/`
 - Native engine module: `android/compressor-core/`
+- Published plugin build: compiles `android/compressor-core/src/main/java` directly so consumer apps do not need an internal Gradle subproject
 - Native validation app: repository-only `android/sample-app/`
 - Standalone Gradle runner: repository-only `android/workspace/`
 
@@ -461,7 +462,8 @@ flutter build apk --debug
 
 ## Status
 
-`0.1.0-dev.4` hardens request validation, output path containment, and
-Android cancellation lifecycle. Android and iOS native cores are present; the
+`0.1.0-dev.5` fixes Android pub.dev consumer builds by making the
+published plugin self-contained. `0.1.0-dev.4` hardened request validation,
+output path containment, and Android cancellation lifecycle. Android and iOS native cores are present; the
 Flutter bridge and examples are being iterated toward a pub.dev-ready v1
 release.

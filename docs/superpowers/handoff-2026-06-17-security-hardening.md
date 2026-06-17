@@ -46,3 +46,19 @@ Before publishing:
 - Consider adding Swift Package Manager support later to improve pub.dev platform scoring.
 - Consider a public security note in README if the API grows to accept caller-controlled output paths from untrusted layers.
 - Keep `outputDirectoryPath` as caller-owned app directory input; do not accept arbitrary public paths without platform-specific sandbox checks.
+
+## Follow-Up: Android Pub.dev Consumer Build Fix
+
+Target version: `0.1.0-dev.5`
+
+Finding: `0.1.0-dev.4` still used `implementation project(':compressor-core')`
+in `android/build.gradle`. That works in the source repository workspace but
+fails when a normal Flutter app consumes the package from pub.dev because the
+consumer build only registers the plugin project, not its internal Gradle
+subproject.
+
+Fix: the published Android plugin module now compiles
+`android/compressor-core/src/main/java` directly via `sourceSets` and declares
+the Media3 dependencies in `android/build.gradle`. The internal
+`android/workspace` setup still keeps `:compressor-core` as a separate module
+for native unit tests and Android sample harness validation.

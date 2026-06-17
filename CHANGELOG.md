@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.0-dev.5
+
+- Fixed Android builds when `vidsqueeze` is consumed from pub.dev by removing
+  the published plugin dependency on the internal Gradle `:compressor-core`
+  subproject.
+- Android plugin builds now include the core source set directly and declare
+  Media3 dependencies in the plugin module.
+
 ## 0.1.0-dev.4
 
 - Hardened `outputFileName` validation across Dart, Android, and iOS so callers
